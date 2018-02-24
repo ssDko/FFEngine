@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Tiled_Engine;
 
 namespace FFEngine
 {
@@ -9,12 +10,20 @@ namespace FFEngine
     /// </summary>
     public class Game1 : Game
     {
+        static int screenWidth = 800;
+        static int screenHeight = 480;
+        static bool isFullScreen = false;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = screenHeight;
+            graphics.IsFullScreen = isFullScreen;
+            graphics.ApplyChanges();
+
             Content.RootDirectory = "Content";
         }
 
@@ -40,7 +49,10 @@ namespace FFEngine
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            Camera.WorldRectangle = new Rectangle(0, 0, 160 * 48, 12 * 48);
+            Camera.Position = Vector2.Zero;
+            Camera.ViewPortWidth = screenWidth;
+            Camera.ViewPortHeight = screenHeight;
         }
 
         /// <summary>
@@ -73,7 +85,7 @@ namespace FFEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
 
