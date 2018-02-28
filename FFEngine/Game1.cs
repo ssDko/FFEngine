@@ -1,7 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tiled_Engine;
+using GameObjects;
+using Tiled_Engine.Layers;
 
 namespace FFEngine
 {
@@ -14,7 +17,15 @@ namespace FFEngine
         static int screenHeight = 480;
         static bool isFullScreen = false;
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        SpriteBatch spriteBatch;        
+        Texture2D spriteSheet;
+        List<Frame> frames;
+        Animation animation;
+        bool done = false;
+
+
+        TileLayer testLayer;
+
 
         public Game1()
         {
@@ -35,8 +46,6 @@ namespace FFEngine
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             base.Initialize();
         }
 
@@ -53,6 +62,16 @@ namespace FFEngine
             Camera.Position = Vector2.Zero;
             Camera.ViewPortWidth = screenWidth;
             Camera.ViewPortHeight = screenHeight;
+
+            spriteSheet = Content.Load<Texture2D>(@"TileSet");
+
+            MapManager.MapDirectory = @"Content\";
+
+            MapManager.LoadMapData(); 
+           
+
+
+
         }
 
         /// <summary>
@@ -74,7 +93,7 @@ namespace FFEngine
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+                    
 
             base.Update(gameTime);
         }
@@ -87,7 +106,12 @@ namespace FFEngine
         {
             GraphicsDevice.Clear(Color.Black);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            
+            
+            
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

@@ -5,7 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GameObjects\GameObjects.csproj" />
+    <Compile Remove="GameObject.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="GameObject.cs" />
   </ItemGroup>
 
   <ItemGroup>

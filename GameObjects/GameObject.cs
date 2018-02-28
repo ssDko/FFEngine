@@ -109,8 +109,8 @@ namespace FFEngine
             updateSprite(gameTime);
 
             Vector2 moveAmount = velocity * elapsed;
-            moveAmount = horizontalCollisionText(moveAmount);
-            moveAmount = verticlaCollisionTest(moveAmount);
+            //moveAmount = horizontalCollisionText(moveAmount);
+            //moveAmount = verticlaCollisionTest(moveAmount);
 
             Vector2 newPosition = worldLocation + moveAmount;
 
