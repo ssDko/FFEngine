@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Tiled_Engine;
 using GameObjects;
 using Tiled_Engine.Layers;
+using System.Collections.Specialized;
 
 namespace FFEngine
 {
@@ -19,12 +20,10 @@ namespace FFEngine
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;        
         Texture2D spriteSheet;
-        List<Frame> frames;
-        Animation animation;
-        bool done = false;
+      
 
 
-        TileLayer testLayer;
+        
 
 
         public Game1()
@@ -66,9 +65,9 @@ namespace FFEngine
             spriteSheet = Content.Load<Texture2D>(@"TileSet");
 
             MapManager.MapDirectory = @"Content\";
+            MapManager.LoadMapData(graphics.GraphicsDevice);
 
-            MapManager.LoadMapData(); 
-           
+                   
 
 
 
@@ -108,7 +107,15 @@ namespace FFEngine
 
             spriteBatch.Begin();
 
-            
+            foreach(TiledTile tile in MapManager.CurrentTileSet.Tiles)
+            {
+
+
+                spriteBatch.Draw(tile.SourceImage,
+                                 new Rectangle((int)tile.PositionOnImage.X + 16, (int)tile.PositionOnImage.Y + 16, tile.TileWidth, tile.TileHeight),
+                                 new Rectangle((int)tile.PositionOnImage.X, (int)tile.PositionOnImage.Y, tile.TileWidth, tile.TileHeight),
+                                 Color.White);
+            }
             
             
             spriteBatch.End();

@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFEngine", "FFEngine\FFEngi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tiled Engine", "Tiled Engine\Tiled Engine.csproj", "{7AE9E45E-27FA-401F-A315-FCD68D6EF928}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameObjects", "GameObjects\GameObjects.csproj", "{6547485F-E11D-4D22-8901-D9F294EC2381}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameObjects", "GameObjects\GameObjects.csproj", "{6547485F-E11D-4D22-8901-D9F294EC2381}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XMLHelper", "XMLHelperMethods\XMLHelper.csproj", "{A2700D11-7C14-4808-ADF1-0167A4100022}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,14 @@ Global
 		{6547485F-E11D-4D22-8901-D9F294EC2381}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6547485F-E11D-4D22-8901-D9F294EC2381}.Release|x86.ActiveCfg = Release|Any CPU
 		{6547485F-E11D-4D22-8901-D9F294EC2381}.Release|x86.Build.0 = Release|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Debug|x86.Build.0 = Debug|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Release|x86.ActiveCfg = Release|Any CPU
+		{A2700D11-7C14-4808-ADF1-0167A4100022}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

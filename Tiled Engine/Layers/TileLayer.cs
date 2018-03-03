@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Tiled_Engine.Layers
 {
@@ -50,7 +51,8 @@ namespace Tiled_Engine.Layers
                          int width,
                          int height,
                          string encodedData,
-                         DataEncoding dataEncoding = DataEncoding.CSV,
+                         List<uint> data,
+                         DataEncoding dataEncoding = DataEncoding.CSV,                         
                          bool visible = true,
                          bool locked = false,
                          float opacity = 1.0f,
@@ -61,8 +63,8 @@ namespace Tiled_Engine.Layers
             this.height = height;
             this.encodedData = encodedData;
             this.dataEncoding = dataEncoding;
-
-            CreateData();
+            this.data = data;
+                       
         }
         #endregion
 
@@ -72,67 +74,59 @@ namespace Tiled_Engine.Layers
 
         }
 
-        private void CreateData()
+        public static List<uint> CreateData(string encodedData, DataEncoding dataEncoding )
         {
             switch(dataEncoding)
             {
                 case DataEncoding.CSV:
-                    CreateDataFromCSV();
-                    break;
-
-                case DataEncoding.XML:
-                    CreateDataFromXML();
-                    break;
-
+                    return CreateDataFromCSV(encodedData);                    
+                                  
                 case DataEncoding.BASE64:
-                    CreateDataFromBase64();
-                    break;
+                    return CreateDataFromBase64(encodedData);
 
                 case DataEncoding.BASE64GZIP:
-                    CreateDataFromBase64GZip();
-                    break;
-
+                    return CreateDataFromBase64GZip(encodedData);
+                   
                 case DataEncoding.BASE64ZLIB:
-                    CreateDataFromBase64ZLib();
-                    break;
+                    return CreateDataFromBase64ZLib(encodedData);
+                    
 
                 default:
-
-                    break;
+                    // Todo: report error
+                    return null;
+                    
             }
         }
 
-        private void CreateDataFromCSV()
+        public static List<uint> CreateData(XElement data, DataEncoding dataEncoding)
         {
-            data = encodedData.Split(',').Select(uint.Parse).ToList();
+            return CreateDataFromXML(data);
         }
 
-        private void CreateDataFromXML()
+        public static List<uint> CreateDataFromXML(XElement element)
         {
-
+            return null; // Todo: report error
         }
 
-        private void CreateDataFromBase64()
+        private static List<uint> CreateDataFromCSV(string encodedData)
         {
+            return encodedData.Split(',').Select(uint.Parse).ToList();
+        }               
 
+        private static List<uint> CreateDataFromBase64(string encodedData)
+        {
+            return null; //Todo
         }
 
-        private void CreateDataFromBase64GZip()
+        private static List<uint> CreateDataFromBase64GZip(string encodedData)
         {
-
+            return null; //Todo
         }
 
-        private void CreateDataFromBase64ZLib()
+        private static List<uint> CreateDataFromBase64ZLib(string encodedData)
         {
-
-        }
-
-        public void ChangeData(string encodedData, DataEncoding dataEncoding)
-        {
-            this.encodedData = encodedData;
-            this.dataEncoding = dataEncoding;
-            CreateData();
-        }
+            return null; //Todo
+        }        
         #endregion
 
     }
