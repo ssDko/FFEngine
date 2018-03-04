@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 
 namespace Tiled_Engine.Layers
 {
@@ -36,7 +34,7 @@ namespace Tiled_Engine.Layers
         public virtual float Opacity
         {
             get { return opacity; }
-            set { opacity = value; }
+            set { opacity = MathHelper.Clamp(value, 0.0f, 1.0f); }
         }
 
         public virtual float HorizontalOffset
@@ -63,7 +61,7 @@ namespace Tiled_Engine.Layers
             this.name = name;
             this.visible = visible;
             this.locked = locked;
-            this.opacity = opacity;
+            this.opacity = MathHelper.Clamp(opacity, 0.0f, 1.0f);
             this.horizontalOffset = horizontalOffset;
             this.verticalOffset = verticalOffset;
         }
@@ -72,7 +70,6 @@ namespace Tiled_Engine.Layers
         #region Methods
         public abstract void Update();
         #endregion
-
 
     }
 }

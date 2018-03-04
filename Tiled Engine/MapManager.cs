@@ -18,15 +18,14 @@ namespace Tiled_Engine
         private static string mapDirectory = "";
         private static TiledMap currentMap;
         private static TiledMap previousMap;
-        private static TiledSet currentTileSet;
+        
 
         private static List<string> mapFiles;
         private static List<string> tileSetFiles;
         private static OrderedDictionary maps;
         private static OrderedDictionary tileSets; //Key is the TSX file name as name and image source could potentially be duplicates
 
-        private static XmlReader xmlReader;
-        private static XElement xElement;
+        
         #endregion
 
         #region Properties
@@ -44,10 +43,10 @@ namespace Tiled_Engine
         {
             get { return previousMap; }
         }
-
-        public static TiledSet CurrentTileSet
+        
+        public static OrderedDictionary TileSets
         {
-            get { return currentTileSet; }
+            get { return tileSets; }
         }
         #endregion
               
@@ -60,6 +59,7 @@ namespace Tiled_Engine
             var fileNames = Directory.EnumerateFiles(mapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
             tileSetFiles = new List<string>(fileNames);
             tileSets = new OrderedDictionary();
+            
 
             // Load the tilesets
             foreach (var fileName in tileSetFiles)
@@ -67,7 +67,7 @@ namespace Tiled_Engine
                 if (File.Exists(mapDirectory + fileName))
                 {
                     // Read in the data
-                    ReadFileIntoXElement(fileName);
+                    XElement xElement = ReadFileIntoXElement(fileName);
 
                     string name = XMLHelperFuncs.GetStringFromAttribute(xElement, "name");
                     int tileWidth = XMLHelperFuncs.GetIntFromAttribute(xElement, "tilewidth");
@@ -131,11 +131,7 @@ namespace Tiled_Engine
                         TiledTile tempTile = new TiledTile(currentID, position, tileWidth, tileHeight, tileSet, type, isAnimated, true, frameData);
 
                         tileSet.AddTile(tempTile);
-                    }
-
-                    xmlReader.Close();
-
-                    currentTileSet = (TiledSet)tileSets[0];
+                    }                                      
                 }
                 else
                 {
@@ -144,38 +140,23 @@ namespace Tiled_Engine
             }
         }
 
-        private static void ReadFileIntoXElement(string fileName)
-        {
-            try
-            {
-                xmlReader = XmlReader.Create(mapDirectory + fileName);
-
-                while (xmlReader.NodeType != XmlNodeType.Element)
-                    xmlReader.Read();
-
-                xElement = XElement.Load(xmlReader);
-            }
-            catch (FileNotFoundException)
-            {
-                //Todo: Report error
-            }
-        }
-
         private static void LoadMaps(GraphicsDevice graphicsDevice)
         {
-            // Find all tile set file names.
+            // Find all map file names.
             string searchPattern = "*.tmx";
             var fileNames = Directory.EnumerateFiles(mapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
             mapFiles = new List<string>(fileNames);
             maps = new OrderedDictionary();
-
-            // Load the tilesets
+            
+            // Load the maps
             foreach (var fileName in mapFiles)
             {
                 if (File.Exists(mapDirectory + fileName))
                 {
+                    TiledMap newMap;
+                    List<Layer> layerList = new List<Layer>();
                     // Read in the data
-                    ReadFileIntoXElement(fileName);
+                    XElement xElement = ReadFileIntoXElement(fileName);
 
                     string version = XMLHelperFuncs.GetStringFromAttribute(xElement, "version");
                     string tiledVersion = XMLHelperFuncs.GetStringFromAttribute(xElement, "tiledversion");
@@ -185,7 +166,7 @@ namespace Tiled_Engine
                     int height = XMLHelperFuncs.GetIntFromAttribute(xElement, "height");
                     int tileWidth = XMLHelperFuncs.GetIntFromAttribute(xElement, "tilewidth");
                     int tileHeight = XMLHelperFuncs.GetIntFromAttribute(xElement, "tileheight");
-                    bool infinite = XMLHelperFuncs.GetBoolFromAttribute(xElement, "infinite");
+                    bool isInfinite = XMLHelperFuncs.GetBoolFromAttribute(xElement, "infinite");
                     int nextObjectID = XMLHelperFuncs.GetIntFromAttribute(xElement, "nextobjectid");
 
                     Orientation orientation;
@@ -216,7 +197,8 @@ namespace Tiled_Engine
                             renderOrder = RenderOrder.LeftDown;
                             break;
                     }
-
+                    
+                    
                     Dictionary<uint, string> tiledSets = new Dictionary<uint, string>();
                     foreach (var element in xElement.Elements())
                     {
@@ -224,102 +206,260 @@ namespace Tiled_Engine
                         // Get tileset info
                         if (element.Name == "tileset")
                         {
-                            uint firstGlobalID = XMLHelperFuncs.GetUIntFromAttribute(element, "firstgid");
-                            string tsxSourceFile = XMLHelperFuncs.GetStringFromAttribute(element, "source");
-                            tiledSets.Add(firstGlobalID, tsxSourceFile);
+                            GenerateMapTileSetInfo(tiledSets, element);
                         }
 
                         // Get tile layer info
                         if (element.Name == "layer")
                         {
-                            string name = XMLHelperFuncs.GetStringFromAttribute(element, "name");
-                            int layerWidth = XMLHelperFuncs.GetIntFromAttribute(element, "width");
-                            int layerHeight = XMLHelperFuncs.GetIntFromAttribute(element, "height");
+                            layerList.Add(GenerateTileLayer(element));
+                        }
 
-                            Layers.DataEncoding dataEncoding = Layers.DataEncoding.CSV;
+                        if (element.Name == "imagelayer")
+                        {
+                            //Todo: add image layer
+                        }
 
-                            // The encoding attribute only exists if data isn't in XML format
-                            if (XMLHelperFuncs.DoesAttributeExist(element.Element("data"), "encoding"))
-                            {
-                                string strDataEncoding = XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "encoding");                                
+                        if (element.Name == "objectgroup")
+                        {
+                            //Todo: add objectgroup layer
+                        }
 
-                                switch (strDataEncoding)
-                                {
-                                    case ("csv"):
-                                        dataEncoding = Layers.DataEncoding.CSV;
-                                        break;
-
-                                    case ("base64"):
-                                        if (XMLHelperFuncs.DoesAttributeExist(element.Element("data"), "compression"))
-                                        {
-                                            if (XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "compression") == "gzip")
-                                            {
-                                                dataEncoding = Layers.DataEncoding.BASE64GZIP;
-                                            }
-                                            else if (XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "compression") == "zlib")
-                                            {
-                                                dataEncoding = Layers.DataEncoding.BASE64ZLIB;
-                                            }
-                                            else
-                                            {
-                                                //Todo: report error that compression is unknown
-                                            }
-                                        }
-                                        else
-                                        {
-                                            dataEncoding = Layers.DataEncoding.BASE64;
-                                        }
-                                        break;
-
-                                    default:
-                                        //Todo: report error that encoding is unkown
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                dataEncoding = Layers.DataEncoding.XML;
-                            }
-
-                            List<uint> data = new List<uint>();
-                            if (dataEncoding != Layers.DataEncoding.XML)
-                            {
-                                string encodedData = XMLHelperFuncs.GetStringFromElement(element, "data");
-
-                                data = TileLayer.CreateData(encodedData, dataEncoding);
-                            }
-                            else
-                            {
-                                string encodedData = "";
-
-                                data = TileLayer.CreateData(element.Element("data"), dataEncoding);
-                               
-                            }
-
+                        if (element.Name == "group")
+                        {
+                            //Todo: add group layer
                         }
                     }
+
+                    newMap = new TiledMap(version, 
+                                          tiledVersion, 
+                                          fileName, 
+                                          orientation, 
+                                          renderOrder, 
+                                          width, 
+                                          height, 
+                                          tileWidth, 
+                                          tileHeight, 
+                                          isInfinite, 
+                                          nextObjectID, 
+                                          tiledSets, 
+                                          layerList);
+
+                   maps.Add(fileName, newMap);
                 }
             }
         }
-        public static void ChangeCurrentMap(string name)
+
+        private static TileLayer GenerateTileLayer(XElement element)
         {
+            string name = XMLHelperFuncs.GetStringFromAttribute(element, "name");
+            int layerWidth = XMLHelperFuncs.GetIntFromAttribute(element, "width");
+            int layerHeight = XMLHelperFuncs.GetIntFromAttribute(element, "height");
+
+            // These attributes don't necisarially exist in the file. 
+            // So if we don't we set what it's default value 'should' be.
+            bool visible = XMLHelperFuncs.GetBoolFromAttribute(element, "visible", true);
+            bool locked = XMLHelperFuncs.GetBoolFromAttribute(element, "locked");
+            float opacity = XMLHelperFuncs.GetFloatFromAttribute(element, "opacity", 1.0f);
+            float horizontalOffset = XMLHelperFuncs.GetFloatFromAttribute(element, "offsetx", 0.0f);
+            float verticalOffset = XMLHelperFuncs.GetFloatFromAttribute(element, "offsety", 0.0f);
+
+            TileLayer layer;
+            string encodedData = "";
+            List<uint> data = new List<uint>();
+
+
+            Layers.DataEncoding dataEncoding = Layers.DataEncoding.CSV;
+
+            // The encoding attribute only exists if data isn't in XML format
+            if (XMLHelperFuncs.DoesAttributeExist(element.Element("data"), "encoding"))
+            {
+                string strDataEncoding = XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "encoding");
+
+                switch (strDataEncoding)
+                {
+                    case ("csv"):
+                        dataEncoding = Layers.DataEncoding.CSV;
+                        break;
+
+                    case ("base64"):
+                        if (XMLHelperFuncs.DoesAttributeExist(element.Element("data"), "compression"))
+                        {
+                            if (XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "compression") == "gzip")
+                            {
+                                dataEncoding = Layers.DataEncoding.BASE64GZIP;
+                            }
+                            else if (XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "compression") == "zlib")
+                            {
+                                dataEncoding = Layers.DataEncoding.BASE64ZLIB;
+                            }
+                            else
+                            {
+                                //Todo: report error that compression is unknown
+                            }
+                        }
+                        else
+                        {
+                            dataEncoding = Layers.DataEncoding.BASE64;
+                        }
+                        break;
+
+                    default:
+                        //Todo: report error that encoding is unkown
+                        break;
+                }
+            }
+            else
+            {
+                dataEncoding = Layers.DataEncoding.XML;
+            }
+
+            // Decode data            
+            if (dataEncoding != Layers.DataEncoding.XML)
+            {
+                encodedData = XMLHelperFuncs.GetStringFromElement(element, "data");
+
+                data = TileLayer.CreateData(encodedData, dataEncoding);
+            }
+            else
+            {
+                encodedData = "";
+
+                data = TileLayer.CreateData(element.Element("data"), dataEncoding);
+
+            }
+
+            layer = new TileLayer(name,
+                                  layerWidth,
+                                  layerHeight,
+                                  encodedData,
+                                  data,
+                                  dataEncoding,
+                                  visible,
+                                  locked,
+                                  opacity,
+                                  horizontalOffset,
+                                  verticalOffset);
+
+            return layer;
 
         }
-        public static void Update()
-        {
 
+        private static void GenerateMapTileSetInfo(Dictionary<uint, string> tiledSets, XElement element)
+        {
+            uint firstGlobalID = XMLHelperFuncs.GetUIntFromAttribute(element, "firstgid");
+            string tsxSourceFile = XMLHelperFuncs.GetStringFromAttribute(element, "source");
+            tiledSets.Add(firstGlobalID, tsxSourceFile);
         }
 
-        public static void Draw()
+        private static XElement ReadFileIntoXElement(string fileName)
         {
+            XmlReader xmlReader;
+            XElement xElement;
+            using (xmlReader = XmlReader.Create(mapDirectory + fileName))
+            {
 
+                while (xmlReader.NodeType != XmlNodeType.Element)
+                    xmlReader.Read();
+
+                xElement = XElement.Load(xmlReader);
+            }
+
+            return xElement;
+        }
+
+        public static bool ChangeCurrentMap(string fileName)
+        {
+            if (maps.Contains(fileName))
+            {
+                previousMap = currentMap;
+                currentMap = (TiledMap)maps[fileName];
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool ChangeCurrentMap(int index)
+        {
+            if (index < maps.Count)
+            {
+                previousMap = currentMap;
+
+                currentMap = (TiledMap)maps[index];
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void Update(GameTime gameTime)
+        {
+            foreach(TiledSet tileSet in tileSets.Values)
+            {
+                tileSet.Update(gameTime);
+            }
+        }
+
+        public static void Draw(SpriteBatch spriteBatch)
+        {
+            foreach (var layer in currentMap.Layers)
+            {
+                if (layer is TileLayer)
+                {
+                    List<uint> firstGlobalIDs = new List<uint>();
+                    firstGlobalIDs = currentMap.TiledSets.Keys.ToList<uint>();
+                    int tilePositionX = 0;
+                    int tilePositionY = 0;
+                    TileLayer tileLayer = layer as TileLayer;
+                    for (int i = 0; i < tileLayer.Data.Count ; i++)
+                    {
+                        uint GlobalID = tileLayer.Data[i];
+
+                        if (GlobalID != 0) //Empty air
+                        {
+                            int tilesetIndex = TiledHelperMethods.GetTileSetIndex(GlobalID, firstGlobalIDs);
+                            int localId = TiledHelperMethods.ConvertGIDToID(GlobalID, firstGlobalIDs);
+
+                            TiledSet tiledSet = (TiledSet)MapManager.tileSets[tilesetIndex];
+
+                            tilePositionX = (i % tileLayer.Width) * tiledSet.TileWidth;
+                            tilePositionY = (i / tileLayer.Width) * tiledSet.TileHeight;
+
+                            int tilePositionOnImageX = 0;
+                            int tilePositionOnImageY = 0;
+                            if (tiledSet.Tiles[localId].IsAnimated)
+                            {
+                                int currentAnimationTileIndex = tiledSet.Tiles[localId].CurrentFrameID;
+                                tilePositionOnImageX = (int)tiledSet.Tiles[currentAnimationTileIndex].PositionOnImage.X;
+                                tilePositionOnImageY = (int)tiledSet.Tiles[currentAnimationTileIndex].PositionOnImage.Y;
+                            }
+                            else
+                            {
+                                tilePositionOnImageX = (int)tiledSet.Tiles[localId].PositionOnImage.X;
+                                tilePositionOnImageY = (int)tiledSet.Tiles[localId].PositionOnImage.Y;
+                            }
+
+                            
+                            // Todo: Rotate the tiles appropriately
+
+                            spriteBatch.Draw(tiledSet.Texture,
+                                             new Rectangle(tilePositionX, tilePositionY, tiledSet.TileWidth, tiledSet.TileHeight),
+                                             new Rectangle(tilePositionOnImageX, tilePositionOnImageY, tiledSet.TileWidth, tiledSet.TileHeight),
+                                             Color.White);
+                        }
+                        
+                    }
+                }
+            }
         }
 
         public static bool LoadMapData(GraphicsDevice graphicsDevice)
         {
             LoadTileSets(graphicsDevice);
             LoadMaps(graphicsDevice);
-            return true;
+            return ChangeCurrentMap(0);
         }
         #endregion
 

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tiled_Engine;
-using GameObjects;
 using Tiled_Engine.Layers;
 using System.Collections.Specialized;
+using System.Collections.Generic;
 
 namespace FFEngine
 {
@@ -65,7 +65,7 @@ namespace FFEngine
             spriteSheet = Content.Load<Texture2D>(@"TileSet");
 
             MapManager.MapDirectory = @"Content\";
-            MapManager.LoadMapData(graphics.GraphicsDevice);
+            MapManager.LoadMapData(graphics.GraphicsDevice);        
 
                    
 
@@ -92,7 +92,7 @@ namespace FFEngine
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-                    
+            MapManager.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -106,16 +106,18 @@ namespace FFEngine
             GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
+            //TiledSet set = (TiledSet)MapManager.TileSets[1];
+            //foreach(TiledTile tile in set.Tiles)
+            //{
 
-            foreach(TiledTile tile in MapManager.CurrentTileSet.Tiles)
-            {
 
+            //    spriteBatch.Draw(tile.SourceImage,
+            //                     new Rectangle((int)tile.PositionOnImage.X + 16, (int)tile.PositionOnImage.Y + 16, tile.TileWidth, tile.TileHeight),
+            //                     new Rectangle((int)tile.PositionOnImage.X, (int)tile.PositionOnImage.Y, tile.TileWidth, tile.TileHeight),
+            //                     Color.White);
+            //}
 
-                spriteBatch.Draw(tile.SourceImage,
-                                 new Rectangle((int)tile.PositionOnImage.X + 16, (int)tile.PositionOnImage.Y + 16, tile.TileWidth, tile.TileHeight),
-                                 new Rectangle((int)tile.PositionOnImage.X, (int)tile.PositionOnImage.Y, tile.TileWidth, tile.TileHeight),
-                                 Color.White);
-            }
+            MapManager.Draw(spriteBatch);
             
             
             spriteBatch.End();

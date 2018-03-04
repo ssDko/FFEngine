@@ -1,4 +1,6 @@
-﻿namespace Tiled_Engine
+﻿using System.Collections.Generic;
+
+namespace Tiled_Engine
 {
     static public class TiledHelperMethods
     {
@@ -10,15 +12,48 @@
 
         #region Methods
 
-        static public int ConvertGIDToID(uint gID)
+        static public int ConvertGIDToID(uint gID, List<uint> firstGlobalIDs = null)
         {
             int id = (int)(gID & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG));
+
+            if (firstGlobalIDs != null)
+            {
+                for (int i = firstGlobalIDs.Count - 1; i >= 0; i--)
+                {
+                    if (id >= firstGlobalIDs[i])
+                    {
+                        id -= (int)firstGlobalIDs[i];
+                        break; // We should have the id we want
+                    }
+                }
+            }
+
             return id;
         }
 
-        static public uint ConvertIDToGID(int ID, bool hFlip, bool vFlip, bool dFlip)
+        static public int GetTileSetIndex(uint gID, List<uint> firstGlobalIDs)
         {
-            uint gID = (uint)ID;
+            int index = firstGlobalIDs.Count - 1;
+            int id = ConvertGIDToID(gID);
+
+            for (int i = firstGlobalIDs.Count - 1; i >= 0; i--)
+            {
+                if (id >= firstGlobalIDs[i])
+                {
+                    return index;
+                }
+                else
+                {
+                    index--;
+                }
+            }
+
+            return -1; // Error
+        }
+
+        static public uint ConvertIDToGID(int ID, bool hFlip, bool vFlip, bool dFlip, uint firstGlobalID = 1)
+        {
+            uint gID = (uint)(ID + firstGlobalID);
 
             // Add in flags
             SetAllGIDFlipFlags(ref gID, hFlip, vFlip, dFlip);

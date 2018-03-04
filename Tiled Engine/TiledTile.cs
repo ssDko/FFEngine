@@ -1,8 +1,6 @@
-﻿using GameObjects;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 
 
 namespace Tiled_Engine
@@ -128,6 +126,11 @@ namespace Tiled_Engine
             get { return animationFrames; }
             set { animationFrames = value; }
         }        
+
+        public int CurrentFrameID
+        {
+            get { return animationFrames[currentFrameIndex].TileID; }
+        }
         #endregion
 
         #region Constructor(s) and Destructor

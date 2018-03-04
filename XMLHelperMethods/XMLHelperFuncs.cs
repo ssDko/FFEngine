@@ -10,34 +10,34 @@ namespace XMLHelper
 
 
         #region Methods
-        public static string GetStringFromAttribute(XElement element, string attribute)
+        public static string GetStringFromAttribute(XElement element, string attribute, string defaultValue = "")
         {
-            return DoesAttributeExist(element, attribute) ? GetAttribute(element, attribute).Value : string.Empty;
+            return DoesAttributeExist(element, attribute) ? GetAttribute(element, attribute).Value : defaultValue;
         }
 
-        public static string GetStringFromElement(XElement baseElement, string subElement)
+        public static string GetStringFromElement(XElement baseElement, string subElement, string defaultValue = "")
         {
-            return DoesElementExist(baseElement, subElement) ? GetElement(baseElement, subElement).Value : string.Empty;
+            return DoesElementExist(baseElement, subElement) ? GetElement(baseElement, subElement).Value : defaultValue;
         }
 
-        public static int GetIntFromAttribute(XElement element, string attribute)
+        public static int GetIntFromAttribute(XElement element, string attribute, int defaultValue = 0)
         {
-            return DoesAttributeExist(element, attribute) ? Convert.ToInt32(GetAttribute(element, attribute).Value) : 0;
+            return DoesAttributeExist(element, attribute) ? Convert.ToInt32(GetAttribute(element, attribute).Value) : defaultValue;
         }
 
-        public static uint GetUIntFromAttribute(XElement element, string attribute)
+        public static uint GetUIntFromAttribute(XElement element, string attribute, uint defaultValue = 0)
         {
-            return DoesAttributeExist(element, attribute) ? Convert.ToUInt32(GetAttribute(element, attribute).Value) : 0;
+            return DoesAttributeExist(element, attribute) ? Convert.ToUInt32(GetAttribute(element, attribute).Value) : defaultValue;
         }
 
-        public static float GetFloatFromAttribute(XElement element, string attribute)
+        public static float GetFloatFromAttribute(XElement element, string attribute, float defaultValue = 0.0f)
         {
-            return DoesAttributeExist(element, attribute) ? Convert.ToSingle(GetAttribute(element, attribute).Value) : 0.0f;            
+            return DoesAttributeExist(element, attribute) ? Convert.ToSingle(GetAttribute(element, attribute).Value) : defaultValue;            
         }
 
-        public static bool GetBoolFromAttribute(XElement element, string attribute)
+        public static bool GetBoolFromAttribute(XElement element, string attribute, bool defaultValue = false)
         {
-            return DoesAttributeExist(element, attribute) ? GetIntFromAttribute(element, attribute) != 0 : false;
+            return DoesAttributeExist(element, attribute) ? GetIntFromAttribute(element, attribute) != 0 : defaultValue;
         }
 
         public static XAttribute GetAttribute(XElement element, string attribute)

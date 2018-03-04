@@ -1,7 +1,8 @@
-﻿using GameObjects;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
+ 
 
 namespace Tiled_Engine
 {
@@ -143,6 +144,16 @@ namespace Tiled_Engine
                 tiles.Add(newTile);
             }
         }
+
+        public void Update(GameTime gameTime)
+        {
+            foreach (TiledTile tile in tiles)
+            {
+                tile.Update(gameTime);
+            }
+        }
+
+
         #endregion
 
 
