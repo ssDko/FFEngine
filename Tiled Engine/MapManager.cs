@@ -420,39 +420,109 @@ namespace Tiled_Engine
                         if (GlobalID != 0) //Empty air
                         {
                             int tilesetIndex = TiledHelperMethods.GetTileSetIndex(GlobalID, firstGlobalIDs);
-                            int localId = TiledHelperMethods.ConvertGIDToID(GlobalID, firstGlobalIDs);
-
+                            int localID = TiledHelperMethods.ConvertGIDToID(GlobalID, firstGlobalIDs);
+                            bool hFlip = TiledHelperMethods.isGIDHorizontallyFlipped(GlobalID);
+                            bool vFlip = TiledHelperMethods.isGIDVerticallyFlipped(GlobalID);
+                            bool dFlip = TiledHelperMethods.isGIDDiagonallyFlipped(GlobalID);
+                            float rotation = 0.0f;
                             TiledSet tiledSet = (TiledSet)MapManager.tileSets[tilesetIndex];
+                            Vector2 origin = new Vector2(tiledSet.TileWidth / 2, tiledSet.TileHeight / 2);
+                            SpriteEffects effects = SpriteEffects.None;
 
                             tilePositionX = (i % tileLayer.Width) * tiledSet.TileWidth;
                             tilePositionY = (i / tileLayer.Width) * tiledSet.TileHeight;
 
                             int tilePositionOnImageX = 0;
                             int tilePositionOnImageY = 0;
-                            if (tiledSet.Tiles[localId].IsAnimated)
+
+                            // Do we draw the default tile or it's animation tiles
+                            if (tiledSet.Tiles[localID].IsAnimated)
                             {
-                                int currentAnimationTileIndex = tiledSet.Tiles[localId].CurrentFrameID;
+                                int currentAnimationTileIndex = tiledSet.Tiles[localID].CurrentFrameID;
                                 tilePositionOnImageX = (int)tiledSet.Tiles[currentAnimationTileIndex].PositionOnImage.X;
                                 tilePositionOnImageY = (int)tiledSet.Tiles[currentAnimationTileIndex].PositionOnImage.Y;
                             }
                             else
                             {
-                                tilePositionOnImageX = (int)tiledSet.Tiles[localId].PositionOnImage.X;
-                                tilePositionOnImageY = (int)tiledSet.Tiles[localId].PositionOnImage.Y;
+                                tilePositionOnImageX = (int)tiledSet.Tiles[localID].PositionOnImage.X;
+                                tilePositionOnImageY = (int)tiledSet.Tiles[localID].PositionOnImage.Y;
                             }
 
+                            //Rotate and flip our sprites
+                            effects = CalculateEffects(hFlip, vFlip, dFlip);
+                            rotation = CalculateRotation(hFlip, vFlip, dFlip);
                             
-                            // Todo: Rotate the tiles appropriately
+
 
                             spriteBatch.Draw(tiledSet.Texture,
-                                             new Rectangle(tilePositionX, tilePositionY, tiledSet.TileWidth, tiledSet.TileHeight),
+                                             new Rectangle(tilePositionX + (int)origin.X, tilePositionY + (int)origin.Y, tiledSet.TileWidth, tiledSet.TileHeight),
                                              new Rectangle(tilePositionOnImageX, tilePositionOnImageY, tiledSet.TileWidth, tiledSet.TileHeight),
-                                             Color.White);
-                        }
-                        
+                                             Color.White,
+                                             rotation,
+                                             origin,
+                                             effects,
+                                             1.0f);
+
+                        }                        
                     }
                 }
             }
+        }
+
+        private static SpriteEffects CalculateEffects(bool hFlip, bool vFlip, bool dFlip)
+        {
+            SpriteEffects effect = SpriteEffects.None;
+            if (!dFlip)
+            {
+                if (hFlip)
+                {
+                    effect |= SpriteEffects.FlipHorizontally;
+                }
+
+                if (vFlip)
+                {
+                    effect |= SpriteEffects.FlipVertically;
+                }
+            }
+            else
+            {
+                // A Diagonal flip is wierd to calculate
+                if (hFlip && vFlip)
+                {
+                    effect = SpriteEffects.FlipHorizontally;
+                }
+
+                if (!hFlip && vFlip)
+                {
+                    effect |= SpriteEffects.FlipHorizontally;
+                    effect |= SpriteEffects.FlipVertically;
+                }
+
+                if (hFlip && !vFlip)
+                {
+                    effect = SpriteEffects.None;
+                }
+
+                if (!hFlip && !vFlip)
+                {
+                    effect = SpriteEffects.FlipVertically;
+                }
+            }
+            return effect;
+        }
+
+        private static float CalculateRotation(bool hFlip, bool vFlip, bool dFlip)
+        {
+            float rotation = 0.0f;
+
+            // A diagonal flip is weird to calculate
+            if (dFlip)
+            {
+                // Rotate 90 degrees
+                rotation = MathHelper.ToRadians(90.0f);
+            }
+
+            return rotation;
         }
 
         public static bool LoadMapData(GraphicsDevice graphicsDevice)

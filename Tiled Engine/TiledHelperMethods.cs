@@ -122,9 +122,9 @@ namespace Tiled_Engine
         {
             uint test = gID;
 
-            test &= FLIPPED_DIAGONALLY_FLAG;
+            test &= FLIPPED_VERTICALLY_FLAG;
 
-            if (test == FLIPPED_DIAGONALLY_FLAG)
+            if (test == FLIPPED_VERTICALLY_FLAG)
                 return true;
             else
                 return false;
@@ -134,9 +134,9 @@ namespace Tiled_Engine
         {
             uint test = gID;
 
-            test &= FLIPPED_VERTICALLY_FLAG;
+            test &= FLIPPED_DIAGONALLY_FLAG;
 
-            if (test == FLIPPED_VERTICALLY_FLAG)
+            if (test == FLIPPED_DIAGONALLY_FLAG)
                 return true;
             else
                 return false;
