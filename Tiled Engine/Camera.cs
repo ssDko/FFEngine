@@ -6,8 +6,7 @@ namespace Tiled_Engine
     {
         #region Declarations
         private static Vector2 position = Vector2.Zero;
-        private static Vector2 viewPortSize = Vector2.Zero;
-        private static Rectangle worldRectangle = new Rectangle(0, 0, 0, 0);
+        private static Vector2 viewPortSize = Vector2.Zero;       
         #endregion
 
         #region Properties
@@ -16,17 +15,79 @@ namespace Tiled_Engine
             get { return position; }
             set
             {
-                position = new Vector2(
-                    MathHelper.Clamp(value.X, worldRectangle.X, worldRectangle.Width - ViewPortWidth),
-                    MathHelper.Clamp(value.Y, worldRectangle.Y, worldRectangle.Height - ViewPortHeight));
+                if (ClampPosition)
+                {
+                    ClampPositonByBounds(value);
+                }
+                else
+                {
+                    position = value;
+                }
             }
         }
 
-        public static Rectangle WorldRectangle
+        public static bool ClampPosition { get; set; } = true;
+
+
+        private static void ClampPositonByBounds(Vector2 value)
         {
-            get { return worldRectangle; }
-            set { worldRectangle = value; }
+            position = value;
+
+            position = new Vector2(
+                                MathHelper.Clamp(value.X,
+                                                 WorldRectangle.X - HorizontalBorderLength,
+                                                 WorldRectangle.Width - (ViewPortWidth / Scaleing) + HorizontalBorderLength),
+                                MathHelper.Clamp(value.Y,
+                                                 WorldRectangle.Y - VerticalBorderLength,
+                                                 WorldRectangle.Height - (ViewPortHeight / Scaleing) + VerticalBorderLength));
+
         }
+
+        public static int Scaleing { get; set; } = 1;
+
+        public static Vector2 BorderLength { get; set; } = Vector2.Zero;
+
+        public static float HorizontalBorderLength
+        {
+            get
+            {
+                return BorderLength.X;
+            }
+            set
+            {
+                BorderLength = new Vector2(value, BorderLength.Y);
+            }
+        } 
+
+        public static float VerticalBorderLength
+        {
+            get
+            {
+                return BorderLength.Y;
+            }
+            set
+            {
+                BorderLength = new Vector2(BorderLength.X, value);
+            }
+        }
+
+        public static int GameWidth
+        {
+            get
+            {
+                return ViewPortWidth / Scaleing;
+            }
+        }
+
+        public static int GameHeight
+        {
+            get
+            {
+                return ViewPortHeight / Scaleing;
+            }
+        }
+
+        public static Rectangle WorldRectangle { get; set; } = new Rectangle(0, 0, 0, 0);
 
         public static int ViewPortWidth
         {
@@ -47,6 +108,7 @@ namespace Tiled_Engine
                 return new Rectangle((int)Position.X, (int)Position.Y, ViewPortWidth, ViewPortHeight);
             }
         }
+       
         #endregion
 
         #region Public Methods
@@ -65,6 +127,11 @@ namespace Tiled_Engine
             return worldLocation - position;
         }
 
+        public static Vector2 WorldToScreen(float x, float y)
+        {
+            return new Vector2(x, y) - position;
+        }
+
         public static Rectangle WorldToScreen(Rectangle worldRectangle)
         {
             return new Rectangle(
@@ -78,6 +145,12 @@ namespace Tiled_Engine
         {
             return screenLocation + position;
         }
+
+        public static Vector2 ScreenToWorld(float x, float y)
+        {
+            return new Vector2(x, y) + position;
+        }
+
         public static Rectangle ScreenToWorld(Rectangle screenRectangle)
         {
             return new Rectangle(
@@ -86,6 +159,8 @@ namespace Tiled_Engine
                 screenRectangle.Width,
                 screenRectangle.Height);
         }
+
+
         #endregion
     }
 }

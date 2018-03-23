@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameObjects\GameObjects.csproj" />
-    <ProjectReference Include="..\XMLHelperMethods\XMLHelper.csproj" />
+    <ProjectReference Include="..\XMLHelperMethods\DkoLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

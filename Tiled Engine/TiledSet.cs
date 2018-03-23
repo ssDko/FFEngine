@@ -7,93 +7,46 @@ using System.IO;
 namespace Tiled_Engine
 {
     public class TiledSet
-    {
-        #region Declarations
-        private string name = "";
-        private int tileWidth = 0;
-        private int tileHeight = 0;
-        private int tileCount = 0;
-        private int columns = 0;
-
-        private string sourceTSXFile = "";
-        private string sourceImage = "";
-        private string sourceDirectory = "";
-        private Texture2D texture;
-
-        private List<TiledTile> tiles;
-        #endregion
-
+    {       
         #region Properties
+        public string Name { get; } = "";
 
-        
-        public string Name
-        {
-            get { return name; }            
-        }
+        public int TileWidth { get; } = 0;
 
-        public int TileWidth
-        {
-            get { return tileWidth; }            
-        }
+        public int TileHeight { get; } = 0;
 
-        public int TileHeight
-        {
-            get { return tileHeight; }            
-        }
+        public int TileCount { get; } = 0;
 
-        public int TileCount
-        {
-            get { return tileCount; }                    
-        }
+        public int Columns { get; } = 0;
 
-        public int Columns
-        {
-            get { return columns; }           
-        }
+        public string SourceTSXFile { get; } = "";
 
-        public string SourceTSXFile
-        {
-            get { return sourceTSXFile; }
-        }
+        public string SourceImage { get; } = "";
 
-        public string SourceImage
-        {
-            get { return sourceImage; }
-        }
-
-        public string SourceDirectory
-        {
-            get { return sourceDirectory; }
-        }
+        public string SourceDirectory { get; } = "";
 
         public int SourceWidth
         {
-            get { return texture.Width; }
+            get { return Texture.Width; }
         }
 
         public int SourceHeight
         {
-            get { return texture.Height; }
+            get { return Texture.Height; }
         }
 
-        public Texture2D Texture
-        {            
-            get { return texture; }  
-        }
+        public Texture2D Texture { get; }
 
         public int ImageWidth
         {
-            get { return texture.Width; }            
+            get { return Texture.Width; }            
         }
+
         public int ImageHeight
         {
-            get { return texture.Height; }            
+            get { return Texture.Height; }            
         }
-        public List<TiledTile> Tiles
-        {
-            get { return tiles; }
-            
-        }
+        public List<TiledTile> Tiles { get; }
         #endregion
 
         #region Constructor(s)
@@ -108,22 +61,22 @@ namespace Tiled_Engine
                         int columns   
                         )
         {
-            this.name = name;
-            this.sourceTSXFile = sourceTSXFile;
-            this.sourceImage = sourceImage;
-            this.sourceDirectory = sourceDirectory;
-            this.columns = columns;
-            this.tileWidth = tileWidth;
-            this.tileHeight = tileHeight;
-            this.tileCount = tileCount;
+            Name = name;
+            SourceTSXFile = sourceTSXFile;
+            SourceImage = sourceImage;
+            SourceDirectory = sourceDirectory;
+            Columns = columns;
+            TileWidth = tileWidth;
+            TileHeight = tileHeight;
+            TileCount = tileCount;
 
-            tiles = new List<TiledTile>();
+            Tiles = new List<TiledTile>();
 
             try
             {
                 FileStream fileSteam = new FileStream(sourceDirectory + sourceImage, FileMode.Open);
 
-                this.texture = Texture2D.FromStream(graphicsDevice, fileSteam);
+                Texture = Texture2D.FromStream(graphicsDevice, fileSteam);
 
                 fileSteam.Close();
             }
@@ -141,13 +94,13 @@ namespace Tiled_Engine
         {
             if (newTile.TiledSet == this)
             {
-                tiles.Add(newTile);
+                Tiles.Add(newTile);
             }
         }
 
         public void Update(GameTime gameTime)
         {
-            foreach (TiledTile tile in tiles)
+            foreach (TiledTile tile in Tiles)
             {
                 tile.Update(gameTime);
             }

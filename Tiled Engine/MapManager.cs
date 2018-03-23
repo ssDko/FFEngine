@@ -7,64 +7,49 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Collections.Specialized;
-using XMLHelper;
+using DkoLib;
 using Tiled_Engine.Layers;
+using GameObjects;
+using Microsoft.Xna.Framework.Input;
+using System.Collections;
 
 namespace Tiled_Engine
 {
     public static class MapManager
     {
         #region Declarations
-        private static string mapDirectory = "";
-        private static TiledMap currentMap;
-        private static TiledMap previousMap;
-        
-
         private static List<string> mapFiles;
         private static List<string> tileSetFiles;
-        private static OrderedDictionary maps;
-        private static OrderedDictionary tileSets; //Key is the TSX file name as name and image source could potentially be duplicates
-
-        
+        private static Player player;
         #endregion
 
         #region Properties
-        public static string MapDirectory
-        {
-            get { return mapDirectory; }
-            set { mapDirectory = value; }
-        }
-        public static TiledMap CurrentMap
-        {
-            get { return currentMap; }
-        }
+        public static string MapDirectory { get; set; } = "";
 
-        public static TiledMap PreviousMap
-        {
-            get { return previousMap; }
-        }
-        
-        public static OrderedDictionary TileSets
-        {
-            get { return tileSets; }
-        }
+        public static TiledMap CurrentMap { get; private set; }
+
+        public static TiledMap PreviousMap { get; private set; }
+
+        public static OrderedDictionary Maps { get; private set; }
+
+        public static OrderedDictionary TileSets { get; private set; }
         #endregion
-              
+
 
         #region Methods
         private static void LoadTileSets(GraphicsDevice graphicsDevice)
         {
             // Find all tile set file names.
             string searchPattern = "*.tsx";
-            var fileNames = Directory.EnumerateFiles(mapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
+            var fileNames = Directory.EnumerateFiles(MapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
             tileSetFiles = new List<string>(fileNames);
-            tileSets = new OrderedDictionary();
+            TileSets = new OrderedDictionary();
             
 
             // Load the tilesets
             foreach (var fileName in tileSetFiles)
             {
-                if (File.Exists(mapDirectory + fileName))
+                if (File.Exists(MapDirectory + fileName))
                 {
                     // Read in the data
                     XElement xElement = ReadFileIntoXElement(fileName);
@@ -77,8 +62,8 @@ namespace Tiled_Engine
                     string sourceImage = XMLHelperFuncs.GetStringFromAttribute(xElement.Element("image"), "source");
 
                     // Create the Tile Set
-                    TiledSet tileSet = new TiledSet(name, fileName, sourceImage, mapDirectory, graphicsDevice, tileWidth, tileHeight, tileCount, columns);
-                    tileSets.Add(fileName, tileSet);
+                    TiledSet tileSet = new TiledSet(name, fileName, sourceImage, MapDirectory, graphicsDevice, tileWidth, tileHeight, tileCount, columns);
+                    TileSets.Add(fileName, tileSet);
 
                     // Add tiles                   
                     for (int currentID = 0; currentID < tileCount; currentID++)
@@ -144,14 +129,14 @@ namespace Tiled_Engine
         {
             // Find all map file names.
             string searchPattern = "*.tmx";
-            var fileNames = Directory.EnumerateFiles(mapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
+            var fileNames = Directory.EnumerateFiles(MapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
             mapFiles = new List<string>(fileNames);
-            maps = new OrderedDictionary();
+            Maps = new OrderedDictionary();
             
             // Load the maps
             foreach (var fileName in mapFiles)
             {
-                if (File.Exists(mapDirectory + fileName))
+                if (File.Exists(MapDirectory + fileName))
                 {
                     TiledMap newMap;
                     List<Layer> layerList = new List<Layer>();
@@ -212,12 +197,12 @@ namespace Tiled_Engine
                         // Get tile layer info
                         if (element.Name == "layer")
                         {
-                            layerList.Add(GenerateTileLayer(element));
+                            layerList.Add(GenerateTileLayer(element, isInfinite, tileWidth, tileHeight));
                         }
 
                         if (element.Name == "imagelayer")
                         {
-                            //Todo: add image layer
+                            layerList.Add(GenerateImageLayer(element, graphicsDevice));
                         }
 
                         if (element.Name == "objectgroup")
@@ -245,12 +230,37 @@ namespace Tiled_Engine
                                           tiledSets, 
                                           layerList);
 
-                   maps.Add(fileName, newMap);
+                   Maps.Add(fileName, newMap);
                 }
             }
         }
 
-        private static TileLayer GenerateTileLayer(XElement element)
+        private static Layer GenerateImageLayer(XElement element, GraphicsDevice graphicsDevice)
+        {
+            string name = XMLHelperFuncs.GetStringFromAttribute(element, "name");
+            string source = XMLHelperFuncs.GetStringFromAttribute(element.Element("image"), "source");            
+
+            bool visible = XMLHelperFuncs.GetBoolFromAttribute(element, "visible", true);
+            bool locked = XMLHelperFuncs.GetBoolFromAttribute(element, "locked");
+            float opacity = XMLHelperFuncs.GetFloatFromAttribute(element, "opacity", 1.0f);
+            float horizontalOffset = XMLHelperFuncs.GetFloatFromAttribute(element, "offsetx", 0.0f);
+            float verticalOffset = XMLHelperFuncs.GetFloatFromAttribute(element, "offsety", 0.0f);
+
+
+            ImageLayer layer = new ImageLayer(name, 
+                                              source, 
+                                              MapDirectory, 
+                                              graphicsDevice, 
+                                              visible, 
+                                              locked, 
+                                              opacity, 
+                                              horizontalOffset, 
+                                              verticalOffset);
+
+            return layer;         
+        }
+
+        private static TileLayer GenerateTileLayer(XElement element, bool isInfinate, int tileWidth, int tileHeight)
         {
             string name = XMLHelperFuncs.GetStringFromAttribute(element, "name");
             int layerWidth = XMLHelperFuncs.GetIntFromAttribute(element, "width");
@@ -265,11 +275,10 @@ namespace Tiled_Engine
             float verticalOffset = XMLHelperFuncs.GetFloatFromAttribute(element, "offsety", 0.0f);
 
             TileLayer layer;
-            string encodedData = "";
-            List<uint> data = new List<uint>();
+            string encodedData = "";            
 
 
-            Layers.DataEncoding dataEncoding = Layers.DataEncoding.CSV;
+            DataEncoding dataEncoding = DataEncoding.CSV;
 
             // The encoding attribute only exists if data isn't in XML format
             if (XMLHelperFuncs.DoesAttributeExist(element.Element("data"), "encoding"))
@@ -279,7 +288,7 @@ namespace Tiled_Engine
                 switch (strDataEncoding)
                 {
                     case ("csv"):
-                        dataEncoding = Layers.DataEncoding.CSV;
+                        dataEncoding = DataEncoding.CSV;
                         break;
 
                     case ("base64"):
@@ -287,11 +296,11 @@ namespace Tiled_Engine
                         {
                             if (XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "compression") == "gzip")
                             {
-                                dataEncoding = Layers.DataEncoding.BASE64GZIP;
+                                dataEncoding = DataEncoding.BASE64GZIP;
                             }
                             else if (XMLHelperFuncs.GetStringFromAttribute(element.Element("data"), "compression") == "zlib")
                             {
-                                dataEncoding = Layers.DataEncoding.BASE64ZLIB;
+                                dataEncoding = DataEncoding.BASE64ZLIB;
                             }
                             else
                             {
@@ -300,7 +309,7 @@ namespace Tiled_Engine
                         }
                         else
                         {
-                            dataEncoding = Layers.DataEncoding.BASE64;
+                            dataEncoding = DataEncoding.BASE64;
                         }
                         break;
 
@@ -311,35 +320,65 @@ namespace Tiled_Engine
             }
             else
             {
-                dataEncoding = Layers.DataEncoding.XML;
-            }
-
-            // Decode data            
-            if (dataEncoding != Layers.DataEncoding.XML)
-            {
-                encodedData = XMLHelperFuncs.GetStringFromElement(element, "data");
-
-                data = TileLayer.CreateData(encodedData, dataEncoding);
-            }
-            else
-            {
-                encodedData = "";
-
-                data = TileLayer.CreateData(element.Element("data"), dataEncoding);
-
+                dataEncoding = DataEncoding.XML;
             }
 
             layer = new TileLayer(name,
                                   layerWidth,
                                   layerHeight,
+                                  tileWidth,
+                                  tileHeight,
                                   encodedData,
-                                  data,
                                   dataEncoding,
                                   visible,
                                   locked,
                                   opacity,
                                   horizontalOffset,
                                   verticalOffset);
+
+            // Decode and add data
+
+            if (!isInfinate)
+            {
+
+                if (dataEncoding != DataEncoding.XML)
+                {
+                    encodedData = XMLHelperFuncs.GetStringFromElement(element, "data");
+                    layer.AddMapChunk<string>(encodedData, 0, 0, layerWidth, layerHeight, tileWidth, tileHeight, dataEncoding);                    
+                }
+                else
+                {
+                    encodedData = "";
+                    XElement dataElement = XMLHelperFuncs.GetElement(element, "data");
+                    layer.AddMapChunk(dataElement, 0, 0, layerWidth, layerHeight, tileWidth, tileHeight, dataEncoding);
+                }
+            }
+            else
+
+            {
+                if (dataEncoding != DataEncoding.XML)
+                {
+                    foreach (var chunkElement in XMLHelperFuncs.GetElement(element, "data").Elements())
+                    {
+                        int x = XMLHelperFuncs.GetIntFromAttribute(chunkElement, "x");
+                        int y = XMLHelperFuncs.GetIntFromAttribute(chunkElement, "y");
+                        int width = XMLHelperFuncs.GetIntFromAttribute(chunkElement, "width");
+                        int height = XMLHelperFuncs.GetIntFromAttribute(chunkElement, "height");
+                        string tempEncodedData = chunkElement.Value.ToString();
+
+                        layer.AddMapChunk(tempEncodedData, x, y, width, height, tileWidth, tileHeight, dataEncoding);
+                    }
+                }
+                else
+                {
+                    encodedData = "";
+
+                    //Todo
+                    
+                }
+            }
+
+            
 
             return layer;
 
@@ -356,7 +395,7 @@ namespace Tiled_Engine
         {
             XmlReader xmlReader;
             XElement xElement;
-            using (xmlReader = XmlReader.Create(mapDirectory + fileName))
+            using (xmlReader = XmlReader.Create(MapDirectory + fileName))
             {
 
                 while (xmlReader.NodeType != XmlNodeType.Element)
@@ -370,11 +409,14 @@ namespace Tiled_Engine
 
         public static bool ChangeCurrentMap(string fileName)
         {
-            if (maps.Contains(fileName))
+            if (Maps.Contains(fileName))
             {
-                previousMap = currentMap;
-                currentMap = (TiledMap)maps[fileName];
-
+                PreviousMap = CurrentMap;
+                CurrentMap = (TiledMap)Maps[fileName];
+                Camera.WorldRectangle = new Rectangle(0, 0,
+                                                      CurrentMap.TileWidth * CurrentMap.MapWidth,
+                                                      CurrentMap.TileHeight * CurrentMap.MapHeight);
+                
                 return true;
             }
 
@@ -382,13 +424,12 @@ namespace Tiled_Engine
         }
 
         public static bool ChangeCurrentMap(int index)
-        {
-            if (index < maps.Count)
+        {    
+            if (index < Maps.Count)
             {
-                previousMap = currentMap;
+                string fileName = Maps.Cast<DictionaryEntry>().ElementAt(index).Key.ToString();
 
-                currentMap = (TiledMap)maps[index];
-                return true;
+                return ChangeCurrentMap(fileName);
             }
 
             return false;
@@ -396,77 +437,186 @@ namespace Tiled_Engine
 
         public static void Update(GameTime gameTime)
         {
-            foreach(TiledSet tileSet in tileSets.Values)
+
+            // Update tiles (animation)
+            foreach(TiledSet tileSet in TileSets.Values)
             {
                 tileSet.Update(gameTime);
             }
+
+            // Update player
+            Vector2 prevPos = player.Position;
+
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                player.Position = new Vector2(player.Position.X + 4, player.Position.Y);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                player.Position = new Vector2(player.Position.X - 4, player.Position.Y);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                player.Position = new Vector2(player.Position.X, player.Position.Y + 4);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                player.Position = new Vector2(player.Position.X, player.Position.Y - 4);
+            }
+
+
+
+            //// Stop the player from going out of bounds
+            //if (player.Position.X < 0 ||
+            //    player.Position.X > Camera.WorldRectangle.Width - player.Texture.Width ||
+            //    player.Position.Y < 0 ||
+            //    player.Position.Y > Camera.WorldRectangle.Height - player.Texture.Height)
+            //{
+            //    player.Position = prevPos;
+            //}
+
+            //Teleport the player if they go out of bounds
+            int wrapX = MyMath.Mod((int)player.Position.X, Camera.WorldRectangle.Width);
+            int wrapY = MyMath.Mod((int)player.Position.Y, Camera.WorldRectangle.Height);
+            player.Position = new Vector2(wrapX, wrapY);
+
+
+
+            // Update Camera to follow the player
+            float cameraNewX = player.Position.X - (Camera.GameWidth / 2);
+            float cameraNewY = player.Position.Y - (Camera.GameHeight / 2);
+            Camera.Position = new Vector2(cameraNewX, cameraNewY);
+
         }
 
         public static void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var layer in currentMap.Layers)
+            for (int layerIndex = 0; layerIndex < CurrentMap.Layers.Count; layerIndex++)
             {
+                float z = 1f - ((float)layerIndex * 0.1f);
+
+                Layer layer = CurrentMap.Layers[layerIndex];
                 if (layer is TileLayer)
                 {
-                    List<uint> firstGlobalIDs = new List<uint>();
-                    firstGlobalIDs = currentMap.TiledSets.Keys.ToList<uint>();
-                    int tilePositionX = 0;
-                    int tilePositionY = 0;
-                    TileLayer tileLayer = layer as TileLayer;
-                    for (int i = 0; i < tileLayer.Data.Count ; i++)
+                    DrawTileLayer(spriteBatch, z, layer);
+                }
+                else if (layer is ImageLayer)
+                {
+                    DrawImageLayer(spriteBatch, z, layer);
+                }
+            }
+
+            // Draw the player
+            Vector2 playerScreenPos = Camera.WorldToScreen(player.Position.X, player.Position.Y);
+            Rectangle playerRect = new Rectangle((int)playerScreenPos.X, (int)playerScreenPos.Y, player.Texture.Width, player.Texture.Height);
+            spriteBatch.Draw(player.Texture, playerRect, player.Texture.Bounds, Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, player.Z);
+        }
+
+        private static void DrawImageLayer(SpriteBatch spriteBatch, float z, Layer layer)
+        {
+            ImageLayer imageLayer = layer as ImageLayer;
+            Rectangle worldRect = new Rectangle((int)imageLayer.HorizontalOffset, (int)imageLayer.VerticalOffset, imageLayer.Width(), imageLayer.Height());
+            Rectangle screenRect = Camera.WorldToScreen(worldRect);
+            Rectangle sourceRect = new Rectangle(0, 0, imageLayer.Width(), imageLayer.Height());
+            spriteBatch.Draw(imageLayer.Image,
+                                screenRect,
+                                sourceRect,
+                                Color.White, 0.0f,
+                                Vector2.Zero,
+                                SpriteEffects.None,
+                                z);            
+        }
+
+        private static void DrawTileLayer(SpriteBatch spriteBatch, float z, Layer layer)
+        {
+            List<uint> firstGlobalIDs = CurrentMap.TiledSets.Keys.ToList<uint>();            
+            TileLayer tileLayer = layer as TileLayer;
+
+           
+            foreach (var chunk in tileLayer.MapChunks)
+            {
+                for (int tileY = 0; tileY < chunk.Height; tileY++)
+                {
+                    for (int tileX = 0; tileX < chunk.Width; tileX++)
                     {
-                        uint GlobalID = tileLayer.Data[i];
+                        uint GlobalID = chunk.Data[tileY, tileX];
 
-                        if (GlobalID != 0) //Empty air
+                        if (GlobalID != 0)
                         {
-                            int tilesetIndex = TiledHelperMethods.GetTileSetIndex(GlobalID, firstGlobalIDs);
-                            int localID = TiledHelperMethods.ConvertGIDToID(GlobalID, firstGlobalIDs);
-                            bool hFlip = TiledHelperMethods.isGIDHorizontallyFlipped(GlobalID);
-                            bool vFlip = TiledHelperMethods.isGIDVerticallyFlipped(GlobalID);
-                            bool dFlip = TiledHelperMethods.isGIDDiagonallyFlipped(GlobalID);
-                            float rotation = 0.0f;
-                            TiledSet tiledSet = (TiledSet)MapManager.tileSets[tilesetIndex];
-                            Vector2 origin = new Vector2(tiledSet.TileWidth / 2, tiledSet.TileHeight / 2);
-                            SpriteEffects effects = SpriteEffects.None;
-
-                            tilePositionX = (i % tileLayer.Width) * tiledSet.TileWidth;
-                            tilePositionY = (i / tileLayer.Width) * tiledSet.TileHeight;
-
-                            int tilePositionOnImageX = 0;
-                            int tilePositionOnImageY = 0;
-
-                            // Do we draw the default tile or it's animation tiles
-                            if (tiledSet.Tiles[localID].IsAnimated)
-                            {
-                                int currentAnimationTileIndex = tiledSet.Tiles[localID].CurrentFrameID;
-                                tilePositionOnImageX = (int)tiledSet.Tiles[currentAnimationTileIndex].PositionOnImage.X;
-                                tilePositionOnImageY = (int)tiledSet.Tiles[currentAnimationTileIndex].PositionOnImage.Y;
-                            }
-                            else
-                            {
-                                tilePositionOnImageX = (int)tiledSet.Tiles[localID].PositionOnImage.X;
-                                tilePositionOnImageY = (int)tiledSet.Tiles[localID].PositionOnImage.Y;
-                            }
-
-                            //Rotate and flip our sprites
-                            effects = CalculateEffects(hFlip, vFlip, dFlip);
-                            rotation = CalculateRotation(hFlip, vFlip, dFlip);
+                            int worldX = (tileX * CurrentMap.TileWidth) + (int)tileLayer.HorizontalOffset + (int)(chunk.Position.X * CurrentMap.TileWidth);
+                            int worldY = (tileY * CurrentMap.TileHeight) + (int)tileLayer.VerticalOffset + (int)(chunk.Position.Y * CurrentMap.TileHeight);
                             
+                            Rectangle worldRect = new Rectangle(worldX, worldY, CurrentMap.TileWidth, CurrentMap.TileHeight);
+                            Rectangle screenRect = Camera.WorldToScreen(worldRect);
+
+                            //Wrap
+                            screenRect.X = MyMath.Mod(screenRect.X, Camera.WorldRectangle.Width);
+                            screenRect.Y = MyMath.Mod(screenRect.Y, Camera.WorldRectangle.Height);
+
+                            //Check bounds
+                            if (screenRect.X + screenRect.Width > 0 &&
+                                screenRect.X < Camera.ViewPortWidth &&
+                                screenRect.Y + screenRect.Height > 0 &&
+                                screenRect.Y < Camera.ViewPortHeight)
+                            {
+
+                                int tilesetIndex = TiledHelperMethods.GetTileSetIndex(GlobalID, firstGlobalIDs);
+                                int localID = TiledHelperMethods.ConvertGIDToID(GlobalID, firstGlobalIDs);
+                                bool hFlip = TiledHelperMethods.isGIDHorizontallyFlipped(GlobalID);
+                                bool vFlip = TiledHelperMethods.isGIDVerticallyFlipped(GlobalID);
+                                bool dFlip = TiledHelperMethods.isGIDDiagonallyFlipped(GlobalID);
+                                float rotation = 0.0f;
+                                TiledSet tiledSet = (TiledSet)MapManager.TileSets[tilesetIndex];
+                                Vector2 origin = new Vector2(tiledSet.TileWidth / 2, tiledSet.TileHeight / 2);
+                                SpriteEffects effects = SpriteEffects.None;
+                                Rectangle sourceRect = new Rectangle();
+
+                                // Do we draw the default tile or it's animation tiles
+                                if (tiledSet.Tiles[localID].IsAnimated)
+                                {
+                                    int currentAnimationTileIndex = tiledSet.Tiles[localID].CurrentFrameID;
+                                    sourceRect = tiledSet.Tiles[currentAnimationTileIndex].Rectangle();
+                                }
+                                else
+                                {
+                                    sourceRect = tiledSet.Tiles[localID].Rectangle();
+                                }
+
+                                //Account for the new sprite origins
+                                screenRect.X += (int)(origin.X);
+                                screenRect.Y += (int)(origin.Y);
+
+                                //Rotate and flip our sprites
+                                effects = CalculateEffects(hFlip, vFlip, dFlip);
+                                rotation = CalculateRotation(hFlip, vFlip, dFlip);
 
 
-                            spriteBatch.Draw(tiledSet.Texture,
-                                             new Rectangle(tilePositionX + (int)origin.X, tilePositionY + (int)origin.Y, tiledSet.TileWidth, tiledSet.TileHeight),
-                                             new Rectangle(tilePositionOnImageX, tilePositionOnImageY, tiledSet.TileWidth, tiledSet.TileHeight),
-                                             Color.White,
-                                             rotation,
-                                             origin,
-                                             effects,
-                                             1.0f);
+                                spriteBatch.Draw(tiledSet.Texture,
+                                                    screenRect,
+                                                    sourceRect,
+                                                    Color.White,
+                                                    rotation,
+                                                    origin,
+                                                    effects,
+                                                    z);
 
-                        }                        
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        private static Vector2 WrapCordinates(Vector2 worldPos)
+        {
+            worldPos.X = MyMath.Mod((int)worldPos.X, Camera.WorldRectangle.Width);
+            worldPos.Y = MyMath.Mod((int)worldPos.Y, Camera.WorldRectangle.Height);
+            int test = 0;
+            return worldPos;
         }
 
         private static SpriteEffects CalculateEffects(bool hFlip, bool vFlip, bool dFlip)
@@ -486,7 +636,7 @@ namespace Tiled_Engine
             }
             else
             {
-                // A Diagonal flip is wierd to calculate
+                // Diagonal flip is wierd to calculate
                 if (hFlip && vFlip)
                 {
                     effect = SpriteEffects.FlipHorizontally;
@@ -525,11 +675,76 @@ namespace Tiled_Engine
             return rotation;
         }
 
+        public static bool Initialize(Player newPlayer, string mapDirectory, GraphicsDevice graphicsDevice)
+        {
+            player = newPlayer;
+            MapDirectory = mapDirectory;
+            return LoadMapData(graphicsDevice);
+        }
+
         public static bool LoadMapData(GraphicsDevice graphicsDevice)
         {
             LoadTileSets(graphicsDevice);
             LoadMaps(graphicsDevice);
             return ChangeCurrentMap(0);
+        }
+
+        public static uint FindGlobalIDatPosition(int x, int y, MapChunk chunk, TileLayer layer)
+        {
+           
+            WrapCordinates(ref x, ref y, layer);
+
+            x /= chunk.Width;
+            y /= chunk.Height;
+
+            x /= layer.TileWidth;
+            y /= layer.TileHeight;
+
+            return chunk.Data[y, x];
+        }
+
+        public static MapChunk FindChunkAtPosition(int x, int y, TileLayer layer)
+        {
+            MapChunk chunk = null;
+
+            WrapCordinates(ref x, ref y, layer);
+
+            foreach (var curChunk in layer.MapChunks)
+            {
+                if (x >= curChunk.WorldPosition.X &&
+                    x <= curChunk.WorldPosition.X + curChunk.PixelWidth &&
+                    y >= curChunk.WorldPosition.Y &&
+                    y <= curChunk.WorldPosition.Y + curChunk.PixelHeight)
+                {
+                    chunk = curChunk;
+                }
+            }
+
+            return chunk;
+        }
+
+        private static void WrapCordinates(ref int x, ref int y, TileLayer layer)
+        {
+            // If we are searching out of bounds, wrap around the cords
+            if (x < 0)
+            {
+                x = layer.PixelWidth + x;
+            }
+
+            if (x > layer.PixelWidth)
+            {
+                x = x - layer.PixelWidth;
+            }
+
+            if (y < 0)
+            {
+                y = layer.PixelHeight + y;
+            }
+
+            if (y > layer.PixelHeight)
+            {
+                y = y - layer.PixelHeight;
+            }
         }
         #endregion
 

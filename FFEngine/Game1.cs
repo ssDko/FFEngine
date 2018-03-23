@@ -3,9 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tiled_Engine;
-using Tiled_Engine.Layers;
-using System.Collections.Specialized;
-using System.Collections.Generic;
+using GameObjects;
 
 namespace FFEngine
 {
@@ -13,18 +11,14 @@ namespace FFEngine
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game
-    {
-        static int screenWidth = 800;
-        static int screenHeight = 480;
+    {        
+        static int scaling = 1;
+        static int screenWidth = 1024;
+        static int screenHeight = 960;
         static bool isFullScreen = false;
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;        
-        Texture2D spriteSheet;
-      
-
-
-        
-
+        SpriteBatch spriteBatch;                
+        Player player;
 
         public Game1()
         {
@@ -53,24 +47,24 @@ namespace FFEngine
         /// all of your content.
         /// </summary>
         protected override void LoadContent()
-        {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+        {          
 
-            Camera.WorldRectangle = new Rectangle(0, 0, 160 * 48, 12 * 48);
-            Camera.Position = Vector2.Zero;
+            // Create a new SpriteBatch, which can be used to draw textures.
+            spriteBatch = new SpriteBatch(GraphicsDevice);          
+
+            player = new Player(new Vector2(16, 16), Content.Load<Texture2D>("Player"));
+
             Camera.ViewPortWidth = screenWidth;
             Camera.ViewPortHeight = screenHeight;
+            Camera.Scaleing = scaling;
 
-            spriteSheet = Content.Load<Texture2D>(@"TileSet");
+            MapManager.Initialize(player, @"Content\", graphics.GraphicsDevice);
 
-            MapManager.MapDirectory = @"Content\";
-            MapManager.LoadMapData(graphics.GraphicsDevice);        
+            Camera.WorldRectangle = new Rectangle(0, 0,
+                                                  MapManager.CurrentMap.TileWidth * MapManager.CurrentMap.MapWidth,
+                                                  MapManager.CurrentMap.TileHeight * MapManager.CurrentMap.MapHeight);
 
-                   
-
-
-
+            Camera.ClampPosition = false;
         }
 
         /// <summary>
@@ -103,23 +97,24 @@ namespace FFEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
 
+            //Render to our target so we can properly scale the screen
+            RenderTarget2D target = new RenderTarget2D(graphics.GraphicsDevice, Camera.GameWidth, Camera.GameHeight);
+            GraphicsDevice.SetRenderTarget(target);
+            
             spriteBatch.Begin();
-            //TiledSet set = (TiledSet)MapManager.TileSets[1];
-            //foreach(TiledTile tile in set.Tiles)
-            //{
-
-
-            //    spriteBatch.Draw(tile.SourceImage,
-            //                     new Rectangle((int)tile.PositionOnImage.X + 16, (int)tile.PositionOnImage.Y + 16, tile.TileWidth, tile.TileHeight),
-            //                     new Rectangle((int)tile.PositionOnImage.X, (int)tile.PositionOnImage.Y, tile.TileWidth, tile.TileHeight),
-            //                     Color.White);
-            //}
-
+           
+            //Rendering
             MapManager.Draw(spriteBatch);
             
+
+            spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(null);
             
+            //Draw to screen
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, null, SamplerState.PointClamp);
+            spriteBatch.Draw(target, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);

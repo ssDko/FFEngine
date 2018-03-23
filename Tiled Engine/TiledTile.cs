@@ -6,130 +6,43 @@ using System.Collections.Generic;
 namespace Tiled_Engine
 {
     public class TiledTile
-    {
-        #region Declarations
-        private static List<TiledTile> TileList;
-
-        private int tileID = 0;       
-        private Texture2D sourceImage;
-        private Vector2 positionOnImage;
-        private int tileWidth = 0;
-        private int tileHeight = 0;
-        private string type;
-        private TiledSet tileSet;
-
-        // Animation specific info
-        private bool isAnimated = false;
-        private bool loopAnimation = true;
-        private bool finishedPlaying = false;
-        private bool isPaused = false;
-        private int currentFrameIndex = 0;
-        private float frameTimer = 0.0f;
-        private List<FrameData> animationFrames;
-
-        #endregion
+    {       
 
         #region Properties
-        public static List<TiledTile> GetTileList
-        {
-            get { return TileList; }
-        }
+        public static List<TiledTile> GetTileList { get; private set; }
 
-        public int TileID
-        {
-            get { return tileID; }
-            set { tileID = value; }
-        }       
+        public int TileID { get; set; } = 0;
 
-        public Texture2D SourceImage
-        {
-            get { return sourceImage; }
-            set { sourceImage = value; }
-        }
+        public Texture2D SourceImage { get; set; }
 
-        public Vector2 PositionOnImage
-        {
-            get { return positionOnImage; }
-            set { positionOnImage = value; }
-        }
+        public Vector2 PositionOnImage { get; set; }
 
-        public float XPositionOnIamge
-        {
-            get { return positionOnImage.X; }
-            set { positionOnImage.X = value; }
-        }
+        public int TileWidth { get; set; } = 0;
 
-        public float YPositionOnIamge
-        {
-            get { return positionOnImage.Y; }
-            set { positionOnImage.Y = value; }
-        }
+        public int TileHeight { get; set; } = 0;
 
-        public int TileWidth
-        {
-            get { return tileWidth; }
-            set { tileWidth = value; }
-        }
-        public int TileHeight
-        {
-            get { return tileHeight; }
-            set { tileHeight = value; }
-        }
+        public string Type { get; set; }
 
-        public string Type
-        {
-            get { return type; }
-            set { type = value; }
-        }
-
-        public TiledSet TiledSet
-        {
-            get { return tileSet; }
-        }
+        public TiledSet TiledSet { get; }
 
         //Animation specific Properties (most are pointless unless IsAnimated = true)
-        public bool IsAnimated
-        {
-            get { return isAnimated; }
-            set { isAnimated = value; }
-        }
+        public bool IsAnimated { get; set; } = false;
 
-        public bool LoopAnimation
-        {
-            get { return loopAnimation; }
-            set { loopAnimation = value; }
-        }
+        public bool LoopAnimation { get; set; } = true;
 
-        public bool FinishedPlaying
-        {
-            get { return finishedPlaying; }
-        }
+        public bool FinishedPlaying { get; private set; } = false;
 
-        public bool IsPaused
-        {
-            get { return isPaused; }
-        }
+        public bool IsPaused { get; private set; } = false;
 
-        private int CurrentFrameIndex
-        {
-            get { return currentFrameIndex; }
-            // set { currentFrameIndex = value; }  //Unsure if someone needs to be able to modify this
-        }
+        private int CurrentFrameIndex { get; set; } = 0;
 
-        private float FrameTimer
-        {
-            get { return frameTimer; }
-        }
+        private float FrameTimer { get; set; } = 0.0f;
 
-        public List<FrameData> AnimationFrames
-        {
-            get { return animationFrames; }
-            set { animationFrames = value; }
-        }        
+        public List<FrameData> AnimationFrames { get; set; }
 
         public int CurrentFrameID
         {
-            get { return animationFrames[currentFrameIndex].TileID; }
+            get { return AnimationFrames[CurrentFrameIndex].TileID; }
         }
         #endregion
 
@@ -144,25 +57,23 @@ namespace Tiled_Engine
                          bool loopAnimation = true,
                          List<FrameData> animationFrames = null)
         {
-            this.tileID = tileID;
-            this.sourceImage = tileSet.Texture;
-            this.positionOnImage = positionOnImage;
-            this.tileWidth = tileWidth;
-            this.tileHeight = tileHeight;
-            this.tileSet = tileSet;
-            this.type = type;
-            this.isAnimated = isAnimated;
-            this.loopAnimation = loopAnimation;
-            this.animationFrames = animationFrames;
+            TileID = tileID;
+            SourceImage = tileSet.Texture;
+            PositionOnImage = positionOnImage;
+            TileWidth = tileWidth;
+            TileHeight = tileHeight;
+            TiledSet = tileSet;
+            Type = type;
+            IsAnimated = isAnimated;
+            LoopAnimation = loopAnimation;
+            AnimationFrames = animationFrames;
 
-            if (TileList == null)
+            if (GetTileList == null)
             {
-                TileList = new List<TiledTile>();
+                GetTileList = new List<TiledTile>();
             }
 
-            TileList.Add(this);
-
-            
+            GetTileList.Add(this);            
         }
 
         public TiledTile(int tileId,                         
@@ -191,7 +102,7 @@ namespace Tiled_Engine
 
         ~TiledTile()
         {
-            TileList.Remove(this);
+            GetTileList.Remove(this);
         }
 
         #endregion
@@ -199,64 +110,69 @@ namespace Tiled_Engine
         #region Methods
         public static void RemoveTileAt(int index)
         {
-            TileList.RemoveAt(index);
+            GetTileList.RemoveAt(index);
         }
 
         public void Update(GameTime gameTime)
         {
 
-            if (isAnimated && !finishedPlaying && !isPaused)
+            if (IsAnimated && !FinishedPlaying && !IsPaused)
             {
                 float elapsed = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                frameTimer += elapsed;
+                FrameTimer += elapsed;
 
-                if (frameTimer >= animationFrames[currentFrameIndex].Duration)
+                if (FrameTimer >= AnimationFrames[CurrentFrameIndex].Duration)
                 {
-                    if (currentFrameIndex >= animationFrames.Count - 1)
+                    if (CurrentFrameIndex >= AnimationFrames.Count - 1)
                     {
-                        if (loopAnimation)
+                        if (LoopAnimation)
                         {
-                            currentFrameIndex = 0;
+                            CurrentFrameIndex = 0;
                         }
                         else
                         {
-                            finishedPlaying = true;
+                            FinishedPlaying = true;
                         }
                     }
                     else
                     {
-                        currentFrameIndex++;
+                        CurrentFrameIndex++;
                     }
-                    frameTimer = 0f;
+                    FrameTimer = 0f;
                 }
             }
         }
 
         public void Play()
         {
-            finishedPlaying = false;
-            isPaused = false;
+            FinishedPlaying = false;
+            IsPaused = false;
         }
 
         public void Stop()
         {
-            finishedPlaying = true;
+            FinishedPlaying = true;
             Restart();
         }
 
         public void Pause()
         {
-            isPaused = true;
+            IsPaused = true;
         }
 
         public void Restart()
         {
-            currentFrameIndex = 0;
+            CurrentFrameIndex = 0;
         }
 
-
-
+        public Rectangle Rectangle()
+        {
+            return new Rectangle(
+                (int)PositionOnImage.X,
+                (int)PositionOnImage.Y,
+                TileWidth,
+                TileHeight);
+        }
         #endregion
     }
-
 }

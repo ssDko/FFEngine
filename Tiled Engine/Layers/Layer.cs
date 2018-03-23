@@ -5,49 +5,25 @@ namespace Tiled_Engine.Layers
     public abstract class Layer
     {
         #region Declarations
-        private string name = "";
-        private bool visible = true;
-        private bool locked = false;
         private float opacity = 1.0f;
-        private float horizontalOffset = 0.0f;
-        private float verticalOffset = 0.0f;
         #endregion
 
         #region Properties
-        public virtual string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-        public virtual bool Visible
-        {
-            get { return visible; }
-            set { visible = value; }
-        }
+        public virtual string Name { get; set; } = "";
 
-        public virtual bool Locked
-        {
-            get { return locked; }
-            set { locked = value; }
-        }
+        public virtual bool Visible { get; set; } = true;
+
+        public virtual bool Locked { get; set; } = false;
 
         public virtual float Opacity
         {
             get { return opacity; }
             set { opacity = MathHelper.Clamp(value, 0.0f, 1.0f); }
-        }
+        } 
 
-        public virtual float HorizontalOffset
-        {
-            get { return horizontalOffset; }
-            set { horizontalOffset = value; }
-        }
+        public virtual float HorizontalOffset { get; set; } = 0.0f;
 
-        public virtual float VerticalOffset
-        {
-            get { return verticalOffset; }
-            set { verticalOffset = value; }
-        }
+        public virtual float VerticalOffset { get; set; } = 0.0f;
         #endregion
 
         #region Constructor(s)
@@ -58,18 +34,14 @@ namespace Tiled_Engine.Layers
                      float horizontalOffset = 0.0f, 
                      float verticalOffset = 0.0f)
         {
-            this.name = name;
-            this.visible = visible;
-            this.locked = locked;
-            this.opacity = MathHelper.Clamp(opacity, 0.0f, 1.0f);
-            this.horizontalOffset = horizontalOffset;
-            this.verticalOffset = verticalOffset;
+            Name = name;
+            Visible = visible;
+            Locked = locked;
+            Opacity = opacity;
+            HorizontalOffset = horizontalOffset;
+            VerticalOffset = verticalOffset;
         }
-        #endregion
-
-        #region Methods
-        public abstract void Update();
-        #endregion
+        #endregion       
 
     }
 }

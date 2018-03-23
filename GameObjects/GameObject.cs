@@ -12,12 +12,12 @@ namespace FFEngine
     public class GameObject
     {
         #region Declarations
-        protected Vector2 worldLocation;
+        
         protected Vector2 velocity;
         protected int frameWidth;
         protected int frameHeight;
 
-        protected bool enabled;
+        
         protected bool vflipped = false;
         protected bool hflipped = false;
 
@@ -27,56 +27,23 @@ namespace FFEngine
         protected bool blocks = false;
 
         protected float drawDepth = 0.85f;
-        protected Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
-        protected string currentSprite;
+        protected Dictionary<int, Texture2D> sprites = new Dictionary<string, Sprite>();
+        protected int currentSprite;
         #endregion
 
         #region Properties
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
+        public Vector2 Position { get; set; }
+        public Vector2 Velocity { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        //public Dictionary<int, Texture2D>  
 
-        public Vector2 WorldLocation
-        {
-            get { return worldLocation; }
-            set { worldLocation = value; }
-        }
 
-        public Vector2 WorldCenter
-        {
-            get
-            {
-                return new Vector2(
-                    (int)worldLocation.X + (int)(frameWidth / 2),
-                    (int)worldLocation.Y + (int)(frameHeight / 2));
-            }
-        }
+        public bool Enabled { get; set; } = true;        
 
-        public Rectangle WorldRectangle
-        {
-            get
-            {
-                return new Rectangle(
-                    (int)worldLocation.X,
-                    (int)worldLocation.Y,
-                    frameWidth,
-                    frameHeight);
-            }
-        }
+        
 
-        public Rectangle CollisionRectangle
-        {
-            get
-            {
-                return new Rectangle(
-                    (int)worldLocation.X + CollisionRectangle.X,
-                    (int)worldLocation.Y + collisionRectangle.Y,
-                    collisionRectangle.Width,
-                    collisionRectangle.Height);
-            }
-            set { collisionRectangle = value; }
+        
         }
         #endregion
 

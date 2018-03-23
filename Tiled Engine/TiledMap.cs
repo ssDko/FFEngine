@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Tiled_Engine.Layers;
@@ -7,86 +8,32 @@ namespace Tiled_Engine
 {
     public class TiledMap
     {
-        #region Declarations
-        private string version = "";
-        private string tiledVersion = "";
-        private string sourceTMXFile = "";
-        private Orientation orientation = Orientation.Orthogonal;
-        private RenderOrder renderOrder = RenderOrder.LeftDown;
-        private int mapWidth = 0;
-        private int mapHeight = 0;
-        private int tileWidth = 0;
-        private int tileHeight = 0;
-        private bool isInfinate = false;
-        private int nextObjectID = 0;
-        private Dictionary<uint, string> tiledSets; // Referenced by thier first GlobalID
-        private List<Layer> layers;
-        #endregion
-
         #region Properties
-        public string Version
-        {
-            get { return version; }            
-        }
+        public string Version { get; } = "";
 
-        public string TiledVersion
-        {
-            get { return tiledVersion; }
-        }
+        public string TiledVersion { get; } = "";
 
-        public string SourceTMXFile
-        {
-            get { return sourceTMXFile; }
-        }
+        public string SourceTMXFile { get; } = "";
 
-        public Orientation Orientation
-        {
-            get { return Orientation; }
-        }
+        public Orientation Orientation { get; } = Orientation.Orthogonal;
 
-        public RenderOrder RenderOrder
-        {
-            get { return renderOrder; }
-        }
+        public RenderOrder RenderOrder { get; } = RenderOrder.LeftDown;
 
-        public int MapWidth
-        {
-            get { return mapWidth; }
-        }
+        public int MapWidth { get; } = 0;
 
-        public int MapHeight
-        {
-            get { return mapHeight; }
-        }
+        public int MapHeight { get; } = 0;
 
-        public int TileWidth
-        {
-            get { return tileWidth; }
-        }
-        public int TileHeight
-        {
-            get { return tileHeight; }
-        }
+        public int TileWidth { get; } = 0;
 
-        public bool IsInfinate
-        {
-            get { return isInfinate; }
-        }
+        public int TileHeight { get; } = 0;
 
-        public int NextObjectID
-        {
-            get { return nextObjectID; }
-        }
+        public bool IsInfinate { get; } = false;
 
-        public Dictionary<uint, string> TiledSets
-        {
-            get { return tiledSets; }
-        }
+        public int NextObjectID { get; } = 0;
 
-        public List<Layer> Layers
-        {
-            get { return layers; }
-        }
+        public Dictionary<uint, string> TiledSets { get; }
+
+        public List<Layer> Layers { get; }
         #endregion
 
         #region Constructor(s)
@@ -104,23 +51,76 @@ namespace Tiled_Engine
                         Dictionary<uint, string> tiledSets,
                         List<Layer> layers)
         {
-            this.version = version;
-            this.tiledVersion = tiledVersion;
-            this.sourceTMXFile = sourceTMXFile;
-            this.orientation = orientation;
-            this.renderOrder = renderOrder;
-            this.mapWidth = mapWidth;
-            this.mapHeight = mapHeight;
-            this.tileWidth = tileWidth;
-            this.tileHeight = tileHeight;
-            this.isInfinate = isInfinate;
-            this.nextObjectID = nextObjectID;
-            this.tiledSets = tiledSets;
-            this.layers = layers;
+            Version = version;
+            TiledVersion = tiledVersion;
+            SourceTMXFile = sourceTMXFile;
+            Orientation = orientation;
+            RenderOrder = renderOrder;
+            MapWidth = mapWidth;
+            MapHeight = mapHeight;
+            TileWidth = tileWidth;
+            TileHeight = tileHeight;
+            IsInfinate = isInfinate;
+            NextObjectID = nextObjectID;
+            TiledSets = tiledSets;
+            Layers = layers;
         }
         #endregion
 
+        #region Methods
+        public int GetCellAtPixelX(int cellX)
+        {
+            return cellX / TileWidth;
+        }
 
+        public int GetCellAtPixelY(int cellY)
+        {
+            return cellY / TileHeight;
+        }
+
+        public Vector2 GetCellByPixel(Vector2 pixelLocation)
+        {
+            return new Vector2(
+                GetCellAtPixelX((int)pixelLocation.X),
+                GetCellAtPixelY((int)pixelLocation.Y));
+        }
+
+        public Vector2 GetCellCenter(int cellX, int cellY)
+        {
+            return new Vector2(
+                (cellX * TileWidth) + (TileWidth / 2),
+                (cellY * TileHeight) + (TileWidth / 2));
+        }
+
+        public Vector2 GetCellCenter(Vector2 cell)
+        {
+            return GetCellCenter(
+                (int)cell.X,
+                (int)cell.Y);
+        }
+
+        public Rectangle CellWorldRectangle(int cellX, int cellY, int horizontalOffset = 0, int verticalOffset = 0)
+        {
+            return new Rectangle(
+                (cellX * TileWidth) + horizontalOffset,
+                (cellY * TileHeight) + verticalOffset,
+                TileWidth,
+                TileHeight);
+        }
+
+        public Rectangle CellWorldRectangle(Vector2 cell)
+        {
+            return CellWorldRectangle(
+                (int)cell.X,
+                (int)cell.Y);
+        }
+
+        public int GetTileIndexAtPixel(int tileX, int tileY)
+        {
+            return tileX + (MapWidth * tileY);
+        }
+        
+        #endregion
     }
 
     public enum Orientation

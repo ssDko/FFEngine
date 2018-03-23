@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,50 +9,41 @@ namespace Tiled_Engine.Layers
 {
     public class TileLayer : Layer
     {
-        #region Declarations
-        private int width = 0;
-        private int height = 0;
-        private DataEncoding dataEncoding = DataEncoding.CSV;
-        private string encodedData = "";
-        private List<uint> data;
-        #endregion
-
         #region Properties
-        public int Width
+        public int Width { get; set; } = 0;
+        public int TileWidth { get; set; } = 0;
+        public int PixelWidth
         {
-            get { return width; }
-            set { width = value; }
+            get
+            {
+                return Width * TileWidth;            
+            }
+        }
+        
+        public int Height { get; set; } = 0;
+        public int TileHeight { get; set; } = 0;
+        public int PixelHeight
+        {
+            get
+            {
+                return Height * TileHeight;
+            }
         }
 
-        public int Height
-        {
-            get { return height; }
-            set { height = value; }
-        }
+        public DataEncoding DataEncoding { get; } = DataEncoding.CSV;
 
-        public DataEncoding DataEncoding
-        {
-            get { return dataEncoding; }            
-        }
+        public string EncodedData { get; } = "";
 
-        public string EncodedData
-        {
-            get { return encodedData; }
-
-        }
-
-        public List<uint> Data
-        {
-            get { return data; }
-        }
+        public List<MapChunk> MapChunks { get; }
         #endregion
 
         #region Constructor(s)
         public TileLayer(string name,
                          int width,
                          int height,
-                         string encodedData,
-                         List<uint> data,
+                         int tileWidth,
+                         int tileHeight,
+                         string encodedData,                         
                          DataEncoding dataEncoding = DataEncoding.CSV,                         
                          bool visible = true,
                          bool locked = false,
@@ -59,74 +51,63 @@ namespace Tiled_Engine.Layers
                          float horizontalOffset = 0.0f,
                          float verticalOffset = 0.0f) : base (name, visible, locked, opacity, horizontalOffset, verticalOffset)
         {
-            this.width = width;
-            this.height = height;
-            this.encodedData = encodedData;
-            this.dataEncoding = dataEncoding;
-            this.data = data;
-                       
+            Width = width;
+            TileWidth = tileWidth;
+            Height = height;
+            TileHeight = tileHeight;
+            EncodedData = encodedData;
+            DataEncoding = dataEncoding;
+            MapChunks = new List<MapChunk>();                       
         }
         #endregion
 
         #region Methods
-        public override void Update()
+        public bool AddMapChunk<T>(T encodedData, int x, int y, int width, int height, int tileWidth, int tileHeight, DataEncoding dataEncoding )
         {
+            bool success = false;
+            MapChunk newChunk = new MapChunk(new Vector2(x, y), width, height, tileWidth, tileHeight);
 
-        }
-
-        public static List<uint> CreateData(string encodedData, DataEncoding dataEncoding )
-        {
-            switch(dataEncoding)
+            // String data
+            if (typeof(T) == typeof(string))
             {
-                case DataEncoding.CSV:
-                    return CreateDataFromCSV(encodedData);                    
-                                  
-                case DataEncoding.BASE64:
-                    return CreateDataFromBase64(encodedData);
+                switch (dataEncoding)
+                {
+                    case DataEncoding.CSV:
+                        success = newChunk.LoadDataFromString(encodedData as string);
+                        break;
 
-                case DataEncoding.BASE64GZIP:
-                    return CreateDataFromBase64GZip(encodedData);
-                   
-                case DataEncoding.BASE64ZLIB:
-                    return CreateDataFromBase64ZLib(encodedData);
-                    
+                    case DataEncoding.BASE64:
+                        // Todo
+                        break;
 
-                default:
-                    // Todo: report error
-                    return null;
-                    
+                    case DataEncoding.BASE64GZIP:
+                        // Todo
+                        break;
+
+                    case DataEncoding.BASE64ZLIB:
+                        // Todo
+                        break;
+
+                    default:
+                        success = false;
+                        break;
+                }
+
+                MapChunks.Add(newChunk);
             }
+            // Element data
+            else if (typeof(T) == typeof(XElement) && dataEncoding == DataEncoding.XML)
+            {
+                // Todo
+            }
+            else
+            {
+                success = false;
+            }
+
+            return success;
         }
-
-        public static List<uint> CreateData(XElement data, DataEncoding dataEncoding)
-        {
-            return CreateDataFromXML(data);
-        }
-
-        public static List<uint> CreateDataFromXML(XElement element)
-        {
-            return null; // Todo: report error
-        }
-
-        private static List<uint> CreateDataFromCSV(string encodedData)
-        {
-            return encodedData.Split(',').Select(uint.Parse).ToList();
-        }               
-
-        private static List<uint> CreateDataFromBase64(string encodedData)
-        {
-            return null; //Todo
-        }
-
-        private static List<uint> CreateDataFromBase64GZip(string encodedData)
-        {
-            return null; //Todo
-        }
-
-        private static List<uint> CreateDataFromBase64ZLib(string encodedData)
-        {
-            return null; //Todo
-        }        
+       
         #endregion
 
     }
