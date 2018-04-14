@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tiled_Engine;
-using GameObjects;
+
 
 namespace FFEngine
 {
@@ -12,13 +12,15 @@ namespace FFEngine
     /// </summary>
     public class Game1 : Game
     {        
-        static int scaling = 1;
+        static int scaling = 4;
         static int screenWidth = 1024;
         static int screenHeight = 960;
         static bool isFullScreen = false;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;                
         Player player;
+        SpriteFont debugFont;
+
 
         public Game1()
         {
@@ -52,11 +54,15 @@ namespace FFEngine
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);          
 
-            player = new Player(new Vector2(16, 16), Content.Load<Texture2D>("Player"));
+            player = new Player(new Vector2(12,16), 16, 16, Content.Load<Texture2D>("Player"), 2);
+
+           
 
             Camera.ViewPortWidth = screenWidth;
             Camera.ViewPortHeight = screenHeight;
             Camera.Scaleing = scaling;
+
+           
 
             MapManager.Initialize(player, @"Content\", graphics.GraphicsDevice);
 
@@ -64,7 +70,15 @@ namespace FFEngine
                                                   MapManager.CurrentMap.TileWidth * MapManager.CurrentMap.MapWidth,
                                                   MapManager.CurrentMap.TileHeight * MapManager.CurrentMap.MapHeight);
 
-            Camera.ClampPosition = false;
+            debugFont = Content.Load<SpriteFont>("DebugText");
+
+            // Set player bounding to map
+            player.RespectBounds = true;
+            player.WillWarpAroundBounds = true;
+            player.Bounds = Camera.WorldRectangle;
+
+
+            Camera.ClampPosition = false;            
         }
 
         /// <summary>
@@ -115,6 +129,9 @@ namespace FFEngine
             //Draw to screen
             spriteBatch.Begin(SpriteSortMode.FrontToBack, null, SamplerState.PointClamp);
             spriteBatch.Draw(target, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+
+            spriteBatch.DrawString(debugFont, "X:" + player.Position.X + ", Y:" + player.Position.Y, new Vector2(0, 0), Color.Black);
+            spriteBatch.DrawString(debugFont, "GX:" + player.GridPosition.X + ", GY:" + player.GridPosition.Y, new Vector2(0, 12), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);

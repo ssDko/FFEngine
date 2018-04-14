@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Specialized;
 using DkoLib;
 using Tiled_Engine.Layers;
-using GameObjects;
+//using GameObjects;
 using Microsoft.Xna.Framework.Input;
 using System.Collections;
 
@@ -20,7 +20,7 @@ namespace Tiled_Engine
         #region Declarations
         private static List<string> mapFiles;
         private static List<string> tileSetFiles;
-        private static Player player;
+        private static Player player;        
         #endregion
 
         #region Properties
@@ -33,6 +33,10 @@ namespace Tiled_Engine
         public static OrderedDictionary Maps { get; private set; }
 
         public static OrderedDictionary TileSets { get; private set; }
+
+        public static bool StartMapExists { get; private set; } = false;
+
+        public static Point StartTilePosition { get; private set; } = new Point(0, 0);  // In Tiles
         #endregion
 
 
@@ -156,6 +160,23 @@ namespace Tiled_Engine
 
                     Orientation orientation;
                     Enum.TryParse(strOrientation, out orientation);
+
+                    // Handle any optional Properties.
+                    if (XMLHelperFuncs.DoesElementExist(xElement, "properties"))
+                    {
+                        XElement properties = XMLHelperFuncs.GetElement(xElement, "properties");
+
+                        //Process properties
+                        foreach (var property in properties.Elements())
+                        {
+                            string name = XMLHelperFuncs.GetStringFromAttribute(property, "name");
+
+                            //Todo
+                            
+
+                        }
+                    }
+
 
                     //Enum.TryParse doesn't know how to convert the render order string tiled makes
                     // So manually we go.
@@ -443,46 +464,32 @@ namespace Tiled_Engine
             {
                 tileSet.Update(gameTime);
             }
+                        
 
-            // Update player
-            Vector2 prevPos = player.Position;
-
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
             {
-                player.Position = new Vector2(player.Position.X + 4, player.Position.Y);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                player.Position = new Vector2(player.Position.X - 4, player.Position.Y);
+                player.Move(Dir.Up);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
             {
-                player.Position = new Vector2(player.Position.X, player.Position.Y + 4);
+                player.Move(Dir.Down);
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
-                player.Position = new Vector2(player.Position.X, player.Position.Y - 4);
+                player.Move(Dir.Left);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                player.Move(Dir.Right);
             }
 
 
 
-            //// Stop the player from going out of bounds
-            //if (player.Position.X < 0 ||
-            //    player.Position.X > Camera.WorldRectangle.Width - player.Texture.Width ||
-            //    player.Position.Y < 0 ||
-            //    player.Position.Y > Camera.WorldRectangle.Height - player.Texture.Height)
-            //{
-            //    player.Position = prevPos;
-            //}
-
-            //Teleport the player if they go out of bounds
-            int wrapX = MyMath.Mod((int)player.Position.X, Camera.WorldRectangle.Width);
-            int wrapY = MyMath.Mod((int)player.Position.Y, Camera.WorldRectangle.Height);
-            player.Position = new Vector2(wrapX, wrapY);
+            player.Update();         
+                       
 
 
 
@@ -553,9 +560,16 @@ namespace Tiled_Engine
                             Rectangle worldRect = new Rectangle(worldX, worldY, CurrentMap.TileWidth, CurrentMap.TileHeight);
                             Rectangle screenRect = Camera.WorldToScreen(worldRect);
 
-                            //Wrap
+                            //Wrap the screen.
+                            // the before and after changes to the position are done for smoothing purposes.
+                            screenRect.X += CurrentMap.TileWidth;
+                            screenRect.Y += CurrentMap.TileHeight;
                             screenRect.X = MyMath.Mod(screenRect.X, Camera.WorldRectangle.Width);
                             screenRect.Y = MyMath.Mod(screenRect.Y, Camera.WorldRectangle.Height);
+                            screenRect.X -= CurrentMap.TileWidth;
+                            screenRect.Y -= CurrentMap.TileHeight;
+
+                            
 
                             //Check bounds
                             if (screenRect.X + screenRect.Width > 0 &&
@@ -679,7 +693,8 @@ namespace Tiled_Engine
         {
             player = newPlayer;
             MapDirectory = mapDirectory;
-            return LoadMapData(graphicsDevice);
+            bool success = LoadMapData(graphicsDevice);
+            return success;
         }
 
         public static bool LoadMapData(GraphicsDevice graphicsDevice)

@@ -5,7 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GameObjects\GameObjects.csproj" />
+    <Compile Remove="Game Objects\GameObject.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Game Objects\GameObject.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\XMLHelperMethods\DkoLib.csproj" />
   </ItemGroup>
 

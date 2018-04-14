@@ -73,16 +73,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GameObjects\GameObjects.csproj">
-      <Project>{6547485f-e11d-4d22-8901-d9f294ec2381}</Project>
-      <Name>GameObjects</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Tiled Engine\Tiled Engine.csproj">
       <Project>{7ae9e45e-27fa-401f-a315-fcd68d6ef928}</Project>
       <Name>Tiled Engine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Corneria2.tmx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Content\Final Fantasy.tsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
