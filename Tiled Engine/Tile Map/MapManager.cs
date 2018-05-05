@@ -464,47 +464,20 @@ namespace Tiled_Engine
             {
                 tileSet.Update(gameTime);
             }
-                        
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-            {
-                player.Move(Dir.Up);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                player.Move(Dir.Down);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                player.Move(Dir.Left);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            {
-                player.Move(Dir.Right);
-            }
-
-
-
-            player.Update();         
-                       
-
-
+            player.Update(gameTime);            
 
             // Update Camera to follow the player
             float cameraNewX = player.Position.X - (Camera.GameWidth / 2);
             float cameraNewY = player.Position.Y - (Camera.GameHeight / 2);
             Camera.Position = new Vector2(cameraNewX, cameraNewY);
-
         }
 
         public static void Draw(SpriteBatch spriteBatch)
         {
             for (int layerIndex = 0; layerIndex < CurrentMap.Layers.Count; layerIndex++)
             {
-                float z = 1f - ((float)layerIndex * 0.1f);
+                float z = (float)layerIndex; 
 
                 Layer layer = CurrentMap.Layers[layerIndex];
                 if (layer is TileLayer)
@@ -518,9 +491,7 @@ namespace Tiled_Engine
             }
 
             // Draw the player
-            Vector2 playerScreenPos = Camera.WorldToScreen(player.Position.X, player.Position.Y);
-            Rectangle playerRect = new Rectangle((int)playerScreenPos.X, (int)playerScreenPos.Y, player.Texture.Width, player.Texture.Height);
-            spriteBatch.Draw(player.Texture, playerRect, player.Texture.Bounds, Color.White, 0.0f, Vector2.Zero, SpriteEffects.None, player.Z);
+            player.Draw(spriteBatch);            
         }
 
         private static void DrawImageLayer(SpriteBatch spriteBatch, float z, Layer layer)
@@ -761,6 +732,50 @@ namespace Tiled_Engine
                 y = y - layer.PixelHeight;
             }
         }
+
+        public static string GetTypeAtCell(int cellX, int cellY, int cellZ)
+        {
+            Layer layer = CurrentMap.Layers[cellZ];
+
+            if (!(layer is TileLayer))
+            {
+                return "nullType"; // Not an legal Tile Layer
+            }
+
+            TileLayer tileLayer = (TileLayer)layer;
+
+            uint GID = tileLayer.GetTileGIDByCell(cellX, cellY);
+            int ID = TiledHelperMethods.ConvertGIDToID(GID);
+            (TiledSet tileSet, uint firstGID) = GetTileSetAndFirstGIDFromID(ID);
+
+            if (tileSet == null)
+            {
+                return "nullType"; //Should not happen
+            }
+
+            return tileSet.Tiles[ID- (int)firstGID].Type;
+
+
+        }
+
+        public static (TiledSet, uint) GetTileSetAndFirstGIDFromID(int id)
+        {
+            foreach (var set in CurrentMap.TiledSets)
+            {
+                if (id >= set.Key)
+                {
+                    TiledSet tileSet = (TiledSet)TileSets[set.Value];
+                    if (id < set.Key + tileSet.TileCount)
+                    {
+                        return (tileSet, set.Key);
+                    }
+                }
+            }
+
+            return (null, 0);
+        }
+
+            
         #endregion
 
     }

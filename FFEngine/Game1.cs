@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tiled_Engine;
@@ -54,7 +53,7 @@ namespace FFEngine
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);          
 
-            player = new Player(new Vector2(12,16), 16, 16, Content.Load<Texture2D>("Player"), 2);
+            player = new Player(new Vector2(12,16), 16, 16, 16, 16, Content.Load<Texture2D>("Player"), 1);
 
            
 
@@ -97,6 +96,8 @@ namespace FFEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+           
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 

@@ -107,6 +107,38 @@ namespace Tiled_Engine.Layers
 
             return success;
         }
+
+        public MapChunk GetChunkByCell(int cellX, int cellY)
+        {
+            foreach (var chunk in MapChunks)
+            {
+                // We found our chunk
+                if (cellX >= chunk.Position.X && cellX < (chunk.Position.X + chunk.Width) &&
+                    cellY >= chunk.Position.Y && cellY < (chunk.Position.Y + chunk.Height))
+                {
+                    return chunk;
+                }
+            }
+
+            // Found nothing
+            return null;
+        }        
+
+        public uint GetTileGIDByCell(int cellX, int cellY)
+        {
+            MapChunk chunk = GetChunkByCell(cellX, cellY);
+            if (chunk != null)
+            {
+                int posX = cellX - (int)chunk.Position.X;
+                int posY = cellY - (int)chunk.Position.Y;
+
+
+                return (chunk.Data[posY, posX]);
+            }
+
+            return 0;
+
+        }
        
         #endregion
 
