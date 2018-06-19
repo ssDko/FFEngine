@@ -41,6 +41,12 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
@@ -51,6 +57,7 @@
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -73,9 +80,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Tiled Engine\Tiled Engine.csproj">
+    <ProjectReference Include="..\Tiled Engine\TiledEngine.csproj">
       <Project>{7ae9e45e-27fa-401f-a315-fcd68d6ef928}</Project>
-      <Name>Tiled Engine</Name>
+      <Name>TiledEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

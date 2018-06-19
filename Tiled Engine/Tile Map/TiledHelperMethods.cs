@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Tiled_Engine
+namespace TiledEngine
 {
     static public class TiledHelperMethods
     {

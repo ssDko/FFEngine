@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Tiled_Engine.Layers;
+using TiledEngine.Layers;
 
-namespace Tiled_Engine
+namespace TiledEngine
 {
     public class TiledMap
     {

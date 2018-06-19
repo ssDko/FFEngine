@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Tiled_Engine
+namespace TiledEngine
 {
     public static class Camera
     {

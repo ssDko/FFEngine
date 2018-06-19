@@ -8,12 +8,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Collections.Specialized;
 using DkoLib;
-using Tiled_Engine.Layers;
+using TiledEngine.Layers;
 //using GameObjects;
 using Microsoft.Xna.Framework.Input;
 using System.Collections;
 
-namespace Tiled_Engine
+namespace TiledEngine
 {
     public static class MapManager
     {
@@ -133,6 +133,7 @@ namespace Tiled_Engine
         {
             // Find all map file names.
             string searchPattern = "*.tmx";
+
             var fileNames = Directory.EnumerateFiles(MapDirectory, searchPattern, SearchOption.TopDirectoryOnly).Select(Path.GetFileName);
             mapFiles = new List<string>(fileNames);
             Maps = new OrderedDictionary();

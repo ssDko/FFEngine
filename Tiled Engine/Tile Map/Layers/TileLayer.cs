@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
-namespace Tiled_Engine.Layers
+namespace TiledEngine.Layers
 {
     public class TileLayer : Layer
     {

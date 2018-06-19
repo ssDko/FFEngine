@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Tiled_Engine.Layers
+namespace TiledEngine.Layers
 {
     class ImageLayer : Layer
     {

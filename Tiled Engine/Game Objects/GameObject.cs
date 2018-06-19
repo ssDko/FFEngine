@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tiled_Engine;
 
-namespace Tiled_Engine
+namespace TiledEngine
 {
     public class GameObject
     {

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 
-namespace Tiled_Engine
+namespace TiledEngine
 {
     public class TiledTile
     {       

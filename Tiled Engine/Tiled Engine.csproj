@@ -1,25 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Game Objects\GameObject.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Game Objects\GameObject.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\XMLHelperMethods\DkoLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup />
 </Project>

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFEngine", "FFEngine\FFEngine.csproj", "{B07ECAE5-8205-4F44-8D9B-D83F8637D6A7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tiled Engine", "Tiled Engine\Tiled Engine.csproj", "{7AE9E45E-27FA-401F-A315-FCD68D6EF928}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiledEngine", "Tiled Engine\TiledEngine.csproj", "{7AE9E45E-27FA-401F-A315-FCD68D6EF928}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DkoLib", "XMLHelperMethods\DkoLib.csproj", "{A2700D11-7C14-4808-ADF1-0167A4100022}"
 EndProject
