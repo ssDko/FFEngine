@@ -59,7 +59,7 @@ namespace FFEngine
         /// </summary>
         protected override void LoadContent()
         {
-            TempMethod();
+            //TempMethod();
 
             DataManager.LoadDataBase();
 
@@ -106,82 +106,7 @@ namespace FFEngine
 
         private static void TempMethod()
         {
-            DBSkill[] test = new DBSkill[1];
-
-            test[0] = new DBSkill();
-
-
-            XmlSerializer writer = new XmlSerializer(typeof(DBSkill[]));
-
-            var path = @"Content\Data\Skills.xml";
-
-            using (System.IO.FileStream file = System.IO.File.Create(path))
-            {
-                writer.Serialize(file, test);
-            }
-
-            //DBActor[] test = new DBActor[2];
-            //List<DBTrait> traits = new List<DBTrait>();
-            //traits.Add(new DBTrait(Codes.AddState, 1, 2, 3, Occasion.Always));
-            //test[0] = new DBActor(1, "Jesse", 1, 1, 99, "Jesse.png", 0, "JB.png", traits );
-            //test[1] = new DBActor(2, "Jesse2", 1, 1, 99, "JesseB.png", 1, "JB2.png", traits, "Kittyface.png");
-
-
-            //XmlSerializer writer = new XmlSerializer(typeof(DBActor[]));
-
-            //var path = @"Content\Data\Actors.xml";
-
-            //using (System.IO.FileStream file = System.IO.File.Create(path))
-            //{
-            //    writer.Serialize(file, test);
-            //}
-
-
-            //DBSystem[] test = new DBSystem[1];
-
-            //List<string> ele = new List<string>();
-            //ele.Add("Status");
-            //ele.Add("Poison");
-            //ele.Add("Stone");
-            //ele.Add("Time");
-            //ele.Add("Death");
-            //ele.Add("Fire");
-            //ele.Add("Ice");
-            //ele.Add("Lightning");
-            //ele.Add("Earth");
-
-            //List<string> ene = new List<string>();
-            //ene.Add("Magical");
-            //ene.Add("Dragon");
-            //ene.Add("Giant");
-            //ene.Add("Undead");
-            //ene.Add("Were");
-            //ene.Add("Aquatic");
-            //ene.Add("Mage");
-            //ene.Add("Regenerative");
-
-            //List<DBStartingEquipment> se = new List<DBStartingEquipment>();
-            //se.Add(new DBStartingEquipment(1, new int[] { 1, 2, 3, 4, 5 }, 1));
-            //se.Add(new DBStartingEquipment(2, new int[] { 5, 4, 3, 2, 1 }, 2));
-            //test[0] = new DBSystem(
-            //    4,
-            //    1024,
-            //    960,
-            //    false,
-            //    ele,
-            //    ene,
-            //    false,
-            //    se);
-
-
-            //XmlSerializer writer = new XmlSerializer(typeof(DBSystem[]));
-
-            //var path = @"Content\Data\System.xml";
-
-            //using (System.IO.FileStream file = System.IO.File.Create(path))
-            //{
-            //    writer.Serialize(file, test);
-            //}
+            
         }
 
         /// <summary>

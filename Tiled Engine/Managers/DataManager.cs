@@ -101,7 +101,6 @@ namespace TiledEngine.Managers
             LoadDataFile(out dataSystems, databaseFiles[nameof(dataSystems)]);
             LoadDataFile(out dataMapsInfo, databaseFiles[nameof(dataMapsInfo)]);
             LoadDataFile(out dataTypes, databaseFiles[nameof(dataTypes)]);
-
         }        
 
         private static void LoadDataFile<T>(out List<T> dataList, string src) 
@@ -131,8 +130,43 @@ namespace TiledEngine.Managers
                 Console.WriteLine("Data file " + src + ", does not exist!");
                 Console.WriteLine("Using default data.");
                 dataList = new List<T>();
+                dataList.Add((T)Activator.CreateInstance(typeof(T)));
+                SaveDataFile<T>(dataList, Path + src);
             }            
-        }    
+        }                
+
+        private static void SaveDataFile<T>(List<T> dataList, string src)
+        {           
+            
+            XmlSerializer writer = new XmlSerializer(typeof(List<T>));
+
+            var path = src;
+
+            using (System.IO.FileStream file = System.IO.File.Create(path))
+            {
+                writer.Serialize(file, dataList);
+            }
+        }
+
+        private static void SaveDataBase()
+        {
+            SaveDataFile(dataActors, databaseFiles[nameof(dataActors)]);
+            SaveDataFile(dataClasses, databaseFiles[nameof(dataClasses)]);
+            SaveDataFile(dataExpCurves, databaseFiles[nameof(dataExpCurves)]);
+            SaveDataFile(dataSkills, databaseFiles[nameof(dataSkills)]);
+            SaveDataFile(dataItems, databaseFiles[nameof(dataItems)]);
+            SaveDataFile(dataWeapons, databaseFiles[nameof(dataWeapons)]);
+            SaveDataFile(dataArmors, databaseFiles[nameof(dataArmors)]);
+            SaveDataFile(dataEnemies, databaseFiles[nameof(dataEnemies)]);
+            SaveDataFile(dataTroops, databaseFiles[nameof(dataTroops)]);
+            SaveDataFile(dataStates, databaseFiles[nameof(dataStates)]);
+            SaveDataFile(dataAnimations, databaseFiles[nameof(dataAnimations)]);
+            SaveDataFile(dataTilesets, databaseFiles[nameof(dataTilesets)]);
+            SaveDataFile(dataCommonEvents, databaseFiles[nameof(dataCommonEvents)]);
+            SaveDataFile(dataSystems, databaseFiles[nameof(dataSystems)]);
+            SaveDataFile(dataMapsInfo, databaseFiles[nameof(dataMapsInfo)]);
+            SaveDataFile(dataTypes, databaseFiles[nameof(dataTypes)]);
+        }
         #endregion
     }
 }

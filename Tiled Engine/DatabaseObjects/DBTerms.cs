@@ -280,7 +280,7 @@ namespace TiledEngine.DatabaseObjects
             MsgPartyName = "%1's Party";            
             MsgEscapeStart = "%1 has started to escape!";
             MsgEscapeFailure = "However, it was unable to escape!";
-            MsgVictory = "%1 was victor;
+            MsgVictory = "%1 was victor";
             MsgDefeat = msgDefeat;
             MsgObtainEXP = msgObtainEXP;
             MsgObtainGold = msgObtainGold;

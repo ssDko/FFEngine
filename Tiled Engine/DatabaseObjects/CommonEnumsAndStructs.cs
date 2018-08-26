@@ -190,6 +190,54 @@ namespace TiledEngine.DatabaseObjects
         Autorun,
         Parallel
     }
+
+    public enum TilesetLayer
+    {
+        A1,
+        A2,
+        A3,
+        A4,
+        A5,
+        B,
+        C,
+        D,
+        E        
+    }
+
+    public enum TilesetMode
+    {
+        WorldType,
+        AreaType
+    }
+
+    public enum TileSize
+    {
+        Eight,
+        Sixteen,        
+        ThirtyTwo,
+        FourtyEight,
+        SixtyFour
+    }
+
+    public enum TilePassage
+    {
+        Passable,
+        NonPassable,
+        PassBehind //This is for when the character is supposed to pass behind the object. Instead of infront
+    }
+    
+    public enum TilePassageDirection
+    {
+        None = 0,
+        Up = 1,
+        Down = 2,
+        Left = 4,
+        Right = 8,
+        All = 15
+
+
+    }
+
   
     #endregion
 
