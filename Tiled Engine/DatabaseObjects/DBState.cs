@@ -5,11 +5,9 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBState
+    public class DBState : DBObject
     {
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations        
         private int iconId;
         private Restriction restriction;
         private int priority;
@@ -38,9 +36,7 @@ namespace TiledEngine.DatabaseObjects
         private string note;        
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties        
         public int IconId { get => iconId; set => iconId = value; }
         public Restriction Restriction { get => restriction; set => restriction = value; }
         public int Priority { get => priority; set => priority = value; }

@@ -69,7 +69,7 @@ namespace TiledEngine.Managers
             databaseFiles.Add("dataTroops", "Troops.xml");
             databaseFiles.Add("dataStates", "States.xml");
             databaseFiles.Add("dataAnimations", "Animations.xml");
-            databaseFiles.Add("dataTilesets", "Tilesets.json");
+            databaseFiles.Add("dataTilesets", "Tilesets.xml");
             databaseFiles.Add("dataCommonEvents", "CommonEvents.xml");
             databaseFiles.Add("dataSystems", "System.xml");
             databaseFiles.Add("dataMapsInfo", "MapsInfo.xml");

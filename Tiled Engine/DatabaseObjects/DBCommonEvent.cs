@@ -4,22 +4,17 @@ using System.Text;
 
 namespace TiledEngine.DatabaseObjects
 {
-    public class DBCommonEvent
+    public class DBCommonEvent : DBObject
     {
         #region Declarations
-        private int id;
-        private string name;
+        
         private Trigger trigger;
         private int switchId;
 
-        private List<EventCommand> eventCommands;
-
-       
+        private List<EventCommand> eventCommands;       
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties        
         public Trigger Trigger { get => trigger; set => trigger = value; }
         public int SwitchId { get => switchId; set => switchId = value; }
 

@@ -8,13 +8,11 @@ using System.Xml.Serialization;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBClass
+    public class DBClass : DBObject
     {
         private static int MaxMagicSlots = 8;
         private static int MaxStatGrowLevels = 98;
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations        
         private int expCurveId;
         private int startingEquipId;
 
@@ -39,9 +37,6 @@ namespace TiledEngine.DatabaseObjects
         #endregion
 
         #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
-
         public int ExpCurveId { get => expCurveId; set => expCurveId = value; }
         public int StartingEquipId { get => startingEquipId; set => startingEquipId = value; }
 

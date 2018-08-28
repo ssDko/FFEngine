@@ -6,7 +6,7 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBSystem
+    public class DBSystem : DBObject
     {
         private static int MaxPartySize = 4;
         
@@ -196,6 +196,8 @@ namespace TiledEngine.DatabaseObjects
         #region Constructor(s)
         public DBSystem()
         {
+            Id = 1;
+            Name = "System Settings";
             Scaling = 4;
             ScreenWidth = 1024;
             ScreenHeight = 960;
@@ -270,6 +272,8 @@ namespace TiledEngine.DatabaseObjects
                         SoundFile shopFX, SoundFile useItemFX, SoundFile useSkillFX, bool itemCommand, bool statusCommand, bool skillCommand, bool formationCommand, bool equipCommand, 
                         bool configurationCommand, bool saveCommand, string tileScreenImage, bool drawGameTitle)
         {
+            Id = 1;
+            Name = "System Settings";
             Scaling = scaling;
             ScreenWidth = screenWidth;
             ScreenHeight = screenHeight;

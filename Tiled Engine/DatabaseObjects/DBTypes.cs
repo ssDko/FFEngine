@@ -5,7 +5,7 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBTypes
+    public class DBTypes : DBObject
     {
         #region Declarations
         private List<string> elements;

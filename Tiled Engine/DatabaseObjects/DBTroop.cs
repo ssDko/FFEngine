@@ -5,21 +5,17 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBTroop
+    public class DBTroop : DBObject
     {
         private static int MaxMemmbers = 9;
 
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations        
         private int[] memmberIds = new int[MaxMemmbers];
         private bool[] hiddenMemmbers = new bool[MaxMemmbers];
         private List<BattleEventPage> eventPages;
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties       
         public int[] MemmberIds { get => memmberIds; set => memmberIds = value; }
         public bool[] HiddenMemmbers { get => hiddenMemmbers; set => hiddenMemmbers = value; }
         public List<BattleEventPage> EventPages { get => eventPages; set => eventPages = value; }

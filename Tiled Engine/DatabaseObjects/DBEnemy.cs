@@ -5,12 +5,10 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBEnemy
+    public class DBEnemy : DBObject
     {
         private static int MaxItemDrops = 3;
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations        
         private int maxHP;
         private int attack;
         private int defense;
@@ -41,9 +39,7 @@ namespace TiledEngine.DatabaseObjects
         
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties        
         public int MaxHP { get => maxHP; set => maxHP = value; }
         public int Attack { get => attack; set => attack = value; }
         public int Defense { get => defense; set => defense = value; }

@@ -6,11 +6,9 @@ using System.Xml.Serialization;
 
 namespace TiledEngine.DatabaseObjects
 {   [Serializable]
-    public class DBActor 
+    public class DBActor : DBObject
     {
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations       
         private int classId; // Index of the characters class     
         private int initialLevel;
         private int maxLevel;
@@ -30,10 +28,7 @@ namespace TiledEngine.DatabaseObjects
 
         #endregion
 
-        #region Properties
-        [XmlAttribute("ID")]
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value;  }
+        #region Properties        
         public int ClassId { get => classId; set => classId = value; }
         public int InitialLevel { get => initialLevel; set => initialLevel = value; }
         public int MaxLevel { get => maxLevel; set => maxLevel = value; }

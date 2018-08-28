@@ -5,11 +5,9 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBSkill
+    public class DBSkill : DBObject
     {
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations        
         private int iconId;
         private string description;
         private SkillType skillType;
@@ -44,9 +42,7 @@ namespace TiledEngine.DatabaseObjects
         private string note;
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties        
         public int IconId { get => iconId; set => iconId = value; }
         public string Description { get => description; set => description = value; }
         public SkillType SkillType { get => skillType; set => skillType = value; }        

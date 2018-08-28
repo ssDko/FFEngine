@@ -5,8 +5,98 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FFEditor"
         mc:Ignorable="d"
-        Title="FFEdit" Height="450" Width="800">
+        Title="FFEdit" Height="734" Width="1054">
+
     <Grid>
-        
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open"/>
+                    <MenuItem Header="_Close"/>
+                    <MenuItem Header="_Save"/>
+                </MenuItem>
+            </Menu>
+            <ToolBarTray DockPanel.Dock="Top" Height="35">
+                <ToolBar>
+
+                </ToolBar>
+            </ToolBarTray>
+            <TabControl DockPanel.Dock="Top">
+                <TabItem Header="Mapper">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+                <TabItem Header="Database">
+                    <Grid Background="#FFE5E5E5">
+                        <TabControl>
+                            <TabItem Header="Actors">
+
+                            </TabItem>
+                            <TabItem Header="Classes">
+
+                            </TabItem>
+                            <TabItem Header="Skills">
+
+                            </TabItem>
+                            <TabItem Header="Items">
+
+                            </TabItem>
+                            <TabItem Header="Weapons">
+
+                            </TabItem>
+                            <TabItem Header="Armors">
+
+                            </TabItem>
+                            <TabItem Header="Enemies">
+
+                            </TabItem>
+                            <TabItem Header="Troops">
+
+                            </TabItem>
+                            <TabItem Header="States">
+
+                            </TabItem>
+                            <TabItem Header="Animations">
+
+                            </TabItem>
+                            <TabItem Header="Tilesets">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width=".75*"/>
+                                        <ColumnDefinition Width="190"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height=".5*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height=".5*"/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Tilesets" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Background="Blue" Foreground="White" HorizontalContentAlignment="Center" FontSize=" 20" BorderThickness="1"/>
+                                    <ComboBox Margin="0,44,0,25" Grid.RowSpan="3" HorizontalAlignment="Stretch" BorderThickness="1" >
+                                        
+                                    </ComboBox>
+                                    <Button Grid.Row="3" Content="Change Maximum..." HorizontalAlignment="Stretch" VerticalAlignment="Bottom"/>
+                                    <GroupBox Grid.Column="1" Grid.RowSpan="3" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,0,0" BorderThickness="1" BorderBrush="Black"/>
+
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Common Events">
+
+                            </TabItem>
+                            <TabItem Header="System">
+
+                            </TabItem>
+                            <TabItem Header="Types">
+
+                            </TabItem>
+                            <TabItem Header="Terms">
+
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
     </Grid>
+
 </Window>

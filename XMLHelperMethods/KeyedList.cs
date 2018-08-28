@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace DkoLib
 {
     [Serializable]
-    public class KeyedList<K, T> : List<KeyValuePair<K, T>>
+    public class KeyedList<K, T> : List<MyKeyValuePair<K, T>>
     {
         #region Declarations
 
@@ -21,9 +22,9 @@ namespace DkoLib
         #region Methods
         public void Add(K key, T value)
         {
-            base.Add(new KeyValuePair<K, T>(key, value));
+            this[key] = value;
         }
-
+        
         public List<K> Keys
         {
             get
@@ -37,8 +38,7 @@ namespace DkoLib
                 return temp;
             }            
         }
-
-
+        
         public T this[K key]
         {
             get
@@ -46,8 +46,8 @@ namespace DkoLib
                 T valueObject = default(T);
 
 
-                KeyValuePair<K, T> pair = this.Find(
-                    delegate (KeyValuePair<K, T> kvp)
+                MyKeyValuePair<K, T> pair = this.Find(
+                    delegate (MyKeyValuePair<K, T> kvp)
                     {
                         return kvp.Key.Equals(key);
                     });
@@ -62,13 +62,19 @@ namespace DkoLib
 
             set
             {
-                KeyValuePair<K, T> pair = this.Find(
-                    delegate (KeyValuePair<K, T> kvp)
+                MyKeyValuePair<K, T> pair = this.Find(
+                    delegate (MyKeyValuePair<K, T> kvp)
                     {
                         return kvp.Key.Equals(key);
                     });
-
-                pair = new KeyValuePair<K, T>(key, value);
+                if (pair != null)
+                {
+                    pair = new MyKeyValuePair<K, T>(key, value);
+                }
+                else
+                {
+                    base.Add(new MyKeyValuePair<K, T>(key, value));
+                }
 
             }
         }

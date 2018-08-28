@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBAnimation
+    public class DBAnimation : DBObject
     {
         #region Declarations
-        private int id;
-        private string name;
         private string image1;
         private string image2;
         private AnimationPosition position;
@@ -20,9 +19,7 @@ namespace TiledEngine.DatabaseObjects
         private List<AnimationFrame> frames;
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties        
         public string Image1 { get => image1; set => image1 = value; }
         public string Image2 { get => image2; set => image2 = value; }
         public AnimationPosition Position { get => position; set => position = value; }

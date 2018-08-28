@@ -5,12 +5,10 @@ using System.Text;
 namespace TiledEngine.DatabaseObjects
 {
     [Serializable]
-    public class DBWeapon
+    public class DBWeapon : DBObject
     {
         private static int MaxSpellSlots = 8;
-        #region Declarations
-        private int id;
-        private string name;
+        #region Declarations        
         private int iconId;
         private string description;
         private int weaponType;
@@ -36,9 +34,7 @@ namespace TiledEngine.DatabaseObjects
         private string note;
         #endregion
 
-        #region Properties
-        public int Id { get => id; set => id = value; }
-        public string Name { get => name; set => name = value; }
+        #region Properties       
         public int IconId { get => iconId; set => iconId = value; }
         public string Description { get => description; set => description = value; }
         public int WeaponType { get => weaponType; set => weaponType = value; }
